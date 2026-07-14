@@ -2,7 +2,7 @@ import { cloneElement, isValidElement, type ComponentPropsWithoutRef, type React
 
 import { cn } from "@/lib/utils/helpers";
 
-type ButtonVariant = "primary" | "secondary" | "outline" | "ghost";
+type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "destructive";
 type ButtonSize = "sm" | "md" | "lg" | "icon";
 
 type ButtonProps = ComponentPropsWithoutRef<"button"> & {
@@ -20,6 +20,8 @@ const variants: Record<ButtonVariant, string> = {
   outline:
     "border border-border bg-background/60 text-foreground hover:border-foreground/30 hover:bg-muted",
   ghost: "text-foreground hover:bg-muted",
+  destructive:
+    "bg-destructive text-destructive-foreground shadow-soft hover:-translate-y-0.5 hover:shadow-glow",
 };
 
 const sizes: Record<ButtonSize, string> = {

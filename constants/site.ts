@@ -15,7 +15,8 @@ export const siteConfig = {
     instagram: "https://instagram.com",
     twitter: "https://x.com",
     email: "hello@3rippletfitness.com",
-    phone: "+1 (555) 013-3344",
-    address: "Premium training studio",
+    phone: "+234 800 000 0000",
+    whatsapp: "2348000000000",
+    address: "Premium training studio, Lagos, Nigeria",
   },
 };

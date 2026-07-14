@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { AtSign, Mail, MapPin, MessageCircle, MoveUpRight, Phone } from "lucide-react";
@@ -15,12 +16,17 @@ export function SiteFooter() {
         <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr]">
           <div>
             <div className="flex items-center gap-3">
-              <span
-                className="grid size-12 place-items-center rounded-lg bg-accent"
+              <div
+                className="relative h-14 w-14 overflow-hidden rounded-lg bg-accent border border-accent"
                 aria-hidden="true"
               >
-                <span className="h-5 w-5 rounded-sm border-2 border-accent-foreground" />
-              </span>
+                <Image
+                  src="/images/placeholders/logo.svg"
+                  alt=""
+                  fill
+                  className="object-contain"
+                />
+              </div>
               <div>
                 <p className="font-display text-lg font-black">{siteConfig.name}</p>
                 <p className="text-sm text-primary-foreground/62">

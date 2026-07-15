@@ -11,7 +11,7 @@ import { Container } from "@/components/ui/container";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-primary-foreground/10 bg-primary text-primary-foreground">
+    <footer className="border-t border-border bg-background text-foreground transition-colors duration-300">
       <Container className="py-12 md:py-16">
         <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr]">
           <div>

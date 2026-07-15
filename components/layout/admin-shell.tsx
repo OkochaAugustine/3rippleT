@@ -10,6 +10,7 @@ import {
   Images,
   LayoutDashboard,
   LogOut,
+  Mail,
   Menu,
   Moon,
   Newspaper,
@@ -36,6 +37,7 @@ const iconMap = {
   Newspaper,
   Users,
   Bell,
+  Mail,
   BarChart3,
   Settings,
 } as const;

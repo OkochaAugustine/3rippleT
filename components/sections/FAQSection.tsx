@@ -16,18 +16,18 @@ export function FAQSection() {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   return (
-    <Section ref={ref} id="faq" className="bg-muted/30">
+    <Section ref={ref} id="faq" className="bg-muted/30 py-16 sm:py-20 md:py-24">
       <Container>
-        <div className="text-center mb-12">
-          <p className="text-sm font-semibold uppercase tracking-[0.36em] text-accent">
+        <div className="text-center mb-10 sm:mb-12">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.36em] text-accent">
             Got Questions?
           </p>
-          <Heading as="h2" size="lg" className="mt-3">
+          <Heading as="h2" size="lg" className="mt-2 sm:mt-3">
             Frequently Asked Questions
           </Heading>
         </div>
 
-        <div className="max-w-3xl mx-auto space-y-4">
+        <div className="max-w-3xl mx-auto space-y-3 sm:space-y-4">
           {faqs.map((faq, i) => (
             <motion.div
               key={faq.id}
@@ -38,9 +38,9 @@ export function FAQSection() {
             >
               <button
                 onClick={() => setOpenId(openId === faq.id ? null : faq.id)}
-                className="flex w-full items-center justify-between gap-6 p-6 text-left"
+                className="flex w-full items-center justify-between gap-4 sm:gap-6 p-4 sm:p-6 text-left"
               >
-                <span className="font-semibold text-lg">{faq.question}</span>
+                <span className="font-semibold text-base sm:text-lg">{faq.question}</span>
                 {openId === faq.id ? (
                   <ChevronUp className="shrink-0 text-accent" />
                 ) : (
@@ -56,7 +56,7 @@ export function FAQSection() {
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     className="overflow-hidden"
                   >
-                    <div className="px-6 pb-6 pt-0 text-muted-foreground">
+                    <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0 text-sm sm:text-base text-muted-foreground">
                       {faq.answer}
                     </div>
                   </motion.div>

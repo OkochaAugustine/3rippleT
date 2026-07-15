@@ -1,13 +1,17 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { motion } from "framer-motion";
-import { BarChart3, Users, Calendar, Images, Newspaper, Video, Bell, Settings, LayoutDashboard } from "lucide-react";
+import { BarChart3, Users, Calendar, Images, Newspaper, Video, Bell, Settings, LayoutDashboard, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { Container } from "@/components/ui/container";
 import { Heading } from "@/components/ui/heading";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useMemberStore } from "@/store/member-store";
+import { formatNGN } from "@/lib/payments";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
@@ -22,6 +26,41 @@ const menuItems = [
 ];
 
 export default function AdminPage() {
+  const { members, loading, fetchMembers } = useMemberStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    fetchMembers();
+  }, [fetchMembers]);
+
+  const planPrices: Record<string, number> = {
+    none: 0,
+    daily: 3000,
+    monthly: 20000,
+    premium: 45000,
+  };
+
+  const activeMembers = members.filter((m) => m.status === "active");
+  const pendingMembers = members.filter((m) => m.status === "pending");
+  
+  // Calculate total monthly revenue based on active member plans
+  const totalRevenue = activeMembers.reduce((acc, m) => {
+    return acc + (planPrices[m.plan] || 0);
+  }, 0);
+
+  const activeRate = members.length 
+    ? Math.round((activeMembers.length / members.length) * 100) 
+    : 0;
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-accent" />
+      </div>
+    );
+  }
+
   return (
     <Section className="bg-background min-h-screen">
       <Container>
@@ -70,62 +109,53 @@ export default function AdminPage() {
             transition={{ delay: 0.3, duration: 0.6 }}
             className="lg:col-span-3 space-y-6"
           >
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-lg border border-border bg-card p-6">
-                <p className="text-sm text-muted-foreground">Total Members</p>
-                <p className="mt-2 text-3xl font-bold">524</p>
-                <p className="mt-1 text-sm text-green-500">+12% this month</p>
+            {loading && members.length === 0 ? (
+              <div className="py-12 flex justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-accent" />
               </div>
-              <div className="rounded-lg border border-border bg-card p-6">
-                <p className="text-sm text-muted-foreground">Active Memberships</p>
-                <p className="mt-2 text-3xl font-bold">487</p>
-                <p className="mt-1 text-sm text-muted-foreground">93% active rate</p>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <div className="rounded-lg border border-border bg-card p-6">
+                  <p className="text-sm text-muted-foreground">Total Members</p>
+                  <p className="mt-2 text-3xl font-bold">{members.length}</p>
+                  <p className="mt-1 text-sm text-green-500">{pendingMembers.length} pending</p>
+                </div>
+                <div className="rounded-lg border border-border bg-card p-6">
+                  <p className="text-sm text-muted-foreground">Active Memberships</p>
+                  <p className="mt-2 text-3xl font-bold">{activeMembers.length}</p>
+                  <p className="mt-1 text-sm text-accent">{activeRate}% active rate</p>
+                </div>
+                <div className="rounded-lg border border-border bg-card p-6">
+                  <p className="text-sm text-muted-foreground">Est. Monthly Rev.</p>
+                  <p className="mt-2 text-2xl font-bold">{formatNGN(totalRevenue)}</p>
+                  <p className="mt-1 text-sm text-green-500">Based on active plans</p>
+                </div>
+                <div className="rounded-lg border border-border bg-card p-6">
+                  <p className="text-sm text-muted-foreground">Upcoming Events</p>
+                  <p className="mt-2 text-3xl font-bold">8</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Next in 5 days</p>
+                </div>
               </div>
-              <div className="rounded-lg border border-border bg-card p-6">
-                <p className="text-sm text-muted-foreground">Monthly Revenue</p>
-                <p className="mt-2 text-3xl font-bold">$72,523</p>
-                <p className="mt-1 text-sm text-green-500">+8% from last month</p>
-              </div>
-              <div className="rounded-lg border border-border bg-card p-6">
-                <p className="text-sm text-muted-foreground">Upcoming Events</p>
-                <p className="mt-2 text-3xl font-bold">8</p>
-                <p className="mt-1 text-sm text-muted-foreground">Next in 5 days</p>
-              </div>
-            </div>
+            )}
 
             <div className="rounded-lg border border-border bg-card p-6">
-              <h3 className="text-lg font-bold">Recent Activity</h3>
+              <h3 className="text-lg font-bold">Recent Registrations</h3>
               <div className="mt-4 space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-accent" />
+                {members.slice(0, 3).map((member) => (
+                  <div key={member.id} className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center font-bold text-accent">
+                      {member.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-semibold">{member.name}</p>
+                      <p className="text-sm text-muted-foreground">Joined {member.plan} plan - status: {member.status}</p>
+                    </div>
+                    <span className="ml-auto text-sm text-muted-foreground">{member.joinedDate}</span>
                   </div>
-                  <div>
-                    <p className="font-semibold">New member registered</p>
-                    <p className="text-sm text-muted-foreground">John Smith joined Premium plan</p>
-                  </div>
-                  <span className="ml-auto text-sm text-muted-foreground">2 hours ago</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
-                    <Calendar className="h-5 w-5 text-accent" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">Event registration</p>
-                    <p className="text-sm text-muted-foreground">25 people signed up for Summer Throwdown</p>
-                  </div>
-                  <span className="ml-auto text-sm text-muted-foreground">5 hours ago</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
-                    <Newspaper className="h-5 w-5 text-accent" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">Blog post published</p>
-                    <p className="text-sm text-muted-foreground">&quot;Progressive Overload Guide&quot; is live</p>
-                  </div>
-                  <span className="ml-auto text-sm text-muted-foreground">1 day ago</span>
-                </div>
+                ))}
+                {members.length === 0 && (
+                  <p className="text-sm text-muted-foreground">No recent registrations</p>
+                )}
               </div>
             </div>
 
@@ -133,21 +163,19 @@ export default function AdminPage() {
               <div className="rounded-lg border border-border bg-card p-6">
                 <h3 className="text-lg font-bold">Quick Actions</h3>
                 <div className="mt-4 space-y-3">
-                  <Button variant="outline" className="w-full justify-start gap-2">
-                    <Users className="h-4 w-4" />
-                    Add New Member
-                  </Button>
+                  <Link href="/admin/members">
+                    <Button variant="outline" className="w-full justify-start gap-2 mb-2">
+                      <Users className="h-4 w-4" />
+                      Manage Members
+                    </Button>
+                  </Link>
                   <Button variant="outline" className="w-full justify-start gap-2">
                     <Calendar className="h-4 w-4" />
                     Create Event
                   </Button>
-                  <Button variant="outline" className="w-full justify-start gap-2">
+                  <Button variant="outline" className="w-full justify-start gap-2 mt-2">
                     <Newspaper className="h-4 w-4" />
                     Write Blog Post
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start gap-2">
-                    <Images className="h-4 w-4" />
-                    Upload Media
                   </Button>
                 </div>
               </div>

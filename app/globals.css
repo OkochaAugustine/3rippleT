@@ -30,9 +30,9 @@
   --foreground: #0a0a0a;
   --card: #ffffff;
   --card-foreground: #0a0a0a;
-  --muted: #f5f5f5;
-  --muted-foreground: #6b7280;
-  --border: #e5e7eb;
+  --muted: #f8fafc;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
   --primary: #0a0a0a;
   --primary-foreground: #ffffff;
   --secondary: #d94f2b;
@@ -55,25 +55,25 @@
 }
 
 .dark {
-  --background: #050505;
-  --foreground: #f0f0f0;
-  --card: #0a0a0a;
-  --card-foreground: #f0f0f0;
-  --muted: #111111;
-  --muted-foreground: #9ca3af;
-  --border: #1f1f1f;
-  --primary: #f0f0f0;
-  --primary-foreground: #050505;
+  --background: #0a0a0a;
+  --foreground: #f8fafc;
+  --card: #0f0f0f;
+  --card-foreground: #f8fafc;
+  --muted: #141414;
+  --muted-foreground: #94a3b8;
+  --border: #1e293b;
+  --primary: #f8fafc;
+  --primary-foreground: #0a0a0a;
   --secondary: #f36b3f;
   --secondary-foreground: #160a05;
   --accent: #c4ff5c;
-  --accent-foreground: #050505;
+  --accent-foreground: #0a0a0a;
   --destructive: #ef4444;
   --destructive-foreground: #fef2f2;
   --nav-glass: rgb(10 10 10 / 0.75);
   --nav-glass-scrolled: rgb(5 5 5 / 0.92);
   --nav-border: rgb(255 255 255 / 0.08);
-  --nav-text: #f0f0f0;
+  --nav-text: #f8fafc;
   --nav-text-shadow: 0 1px 3px rgb(0 0 0 / 0.8);
   --nav-shadow: 0 4px 32px rgb(0 0 0 / 0.4), 0 1px 8px rgb(0 0 0 / 0.2);
   --nav-shadow-scrolled: 0 8px 48px rgb(0 0 0 / 0.5), 0 2px 12px rgb(0 0 0 / 0.3);
@@ -99,11 +99,18 @@ body {
   font-family: var(--font-body);
 }
 
+body {
+  background:
+    radial-gradient(circle at 15% 20%, rgb(140 198 63 / 0.04), transparent 40rem),
+    radial-gradient(circle at 85% 80%, rgb(59 130 246 / 0.03), transparent 35rem),
+    var(--background);
+}
+
 .dark body {
   background:
-    radial-gradient(circle at 15% 20%, rgb(140 198 63 / 0.08), transparent 40rem),
-    radial-gradient(circle at 85% 80%, rgb(59 130 246 / 0.06), transparent 35rem),
-    radial-gradient(circle at 50% 50%, rgb(168 85 247 / 0.04), transparent 50rem),
+    radial-gradient(circle at 15% 20%, rgb(140 198 63 / 0.12), transparent 40rem),
+    radial-gradient(circle at 85% 80%, rgb(59 130 246 / 0.1), transparent 35rem),
+    radial-gradient(circle at 50% 50%, rgb(168 85 247 / 0.08), transparent 50rem),
     var(--background);
 }
 
@@ -188,15 +195,17 @@ select {
 }
 
 .glass-card {
-  background: rgb(255 255 255 / 0.08);
-  border: 1px solid rgb(255 255 255 / 0.14);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgb(255 255 255 / 0.7);
+  border: 1px solid rgb(0 0 0 / 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 4px 24px rgb(0 0 0 / 0.04), 0 1px 3px rgb(0 0 0 / 0.02);
 }
 
 .dark .glass-card {
-  background: rgb(255 255 255 / 0.04);
+  background: rgb(255 255 255 / 0.03);
   border-color: rgb(255 255 255 / 0.08);
+  box-shadow: 0 4px 32px rgb(0 0 0 / 0.3), 0 1px 8px rgb(0 0 0 / 0.15);
 }
 
 .nav-link-glow {
@@ -331,7 +340,7 @@ select {
 .premium-card {
   border: 1px solid var(--border);
   border-radius: 1.25rem;
-  background: var(--card);
+  background: linear-gradient(135deg, var(--card) 0%, var(--muted) 200%);
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.04);
   transition:
     transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
@@ -342,6 +351,15 @@ select {
   box-shadow: 0 4px 12px rgb(0 0 0 / 0.06), 0 16px 40px rgb(0 0 0 / 0.08);
 }
 
+.dark .premium-card {
+  background: linear-gradient(135deg, var(--card) 0%, rgb(20 20 20) 200%);
+  box-shadow: 0 4px 24px rgb(0 0 0 / 0.3), 0 1px 8px rgb(0 0 0 / 0.15);
+}
+
+.dark .premium-card:hover {
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.4), 0 2px 12px rgb(0 0 0 / 0.2);
+}
+
 .dashboard-stat-card {
   position: relative;
   overflow: hidden;
@@ -349,6 +367,11 @@ select {
   border: 1px solid var(--border);
   background: linear-gradient(135deg, var(--card) 0%, var(--muted) 200%);
   padding: 1.25rem;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.04);
+}
+
+.dark .dashboard-stat-card {
+  box-shadow: 0 4px 24px rgb(0 0 0 / 0.3), 0 1px 8px rgb(0 0 0 / 0.15);
 }
 
 .dashboard-stat-card::before {

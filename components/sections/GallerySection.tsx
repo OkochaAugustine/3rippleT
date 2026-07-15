@@ -24,7 +24,7 @@ export function GallerySection() {
   const gallery = useMediaStore((state) => state.media);
 
   return (
-    <Section ref={ref} id="gallery" className="relative overflow-hidden bg-muted/20">
+    <Section ref={ref} id="gallery" className="relative overflow-hidden bg-muted/20 py-16 sm:py-20 md:py-24">
       <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-secondary/5 pointer-events-none" aria-hidden="true" />
       
       <Container>
@@ -32,12 +32,12 @@ export function GallerySection() {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.36em] text-accent">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.36em] text-accent">
             Inside Our Gym
           </p>
-          <Heading as="h2" size="lg" className="mt-3">
+          <Heading as="h2" size="lg" className="mt-2 sm:mt-3">
             Gallery
           </Heading>
         </motion.div>
@@ -59,11 +59,12 @@ export function GallerySection() {
               modifier: 2.5,
               slideShadows: false,
             }}
-            spaceBetween={30}
+            spaceBetween={16}
             slidesPerView={1}
             breakpoints={{
-              640: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
+              480: { slidesPerView: 1, spaceBetween: 16 },
+              640: { slidesPerView: 2, spaceBetween: 20 },
+              1024: { slidesPerView: 3, spaceBetween: 24 },
             }}
             className="!pb-20"
           >
@@ -86,8 +87,8 @@ export function GallerySection() {
                     initial={{ scale: 0.8 }}
                     whileHover={{ scale: 1 }}
                   >
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/90 backdrop-blur-sm text-accent-foreground">
-                      <ZoomIn className="size-7" />
+                    <div className="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-accent/90 backdrop-blur-sm text-accent-foreground">
+                      <ZoomIn className="size-6 sm:size-7" />
                     </div>
                   </motion.div>
                   {item.category && (
@@ -107,7 +108,7 @@ export function GallerySection() {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center mt-8"
+          className="text-center mt-8 sm:mt-10"
         >
           <Button asChild variant="outline" size="lg" className="rounded-full gap-2">
             <Link href="/gallery">

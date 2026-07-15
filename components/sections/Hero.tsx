@@ -218,8 +218,8 @@ export function Hero() {
         className="hero-gradient-orb absolute -right-24 bottom-1/4 size-80 bg-secondary/15 [animation-delay:4s]"
       />
 
-      <Container className="relative z-10 py-16 lg:py-24">
-        <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
+      <Container className="relative z-10 py-8 sm:py-12 md:py-16 lg:py-24">
+        <div className="grid gap-6 sm:gap-8 lg:gap-12 lg:grid-cols-12 lg:items-center">
           
           {/* Hero Left Content Column */}
           <motion.div 
@@ -227,18 +227,18 @@ export function Hero() {
             className="lg:col-span-7"
           >
             {/* Tag Badge */}
-            <div className="hero-badge inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white/90 backdrop-blur-md">
-              <span className="size-2 animate-pulse rounded-full bg-accent shadow-[0_0_12px_var(--accent)]" />
+            <div className="hero-badge inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 sm:px-3.5 sm:py-1.5 md:px-4 md:py-2 text-[10px] sm:text-xs md:text-sm font-semibold text-white/90 backdrop-blur-md">
+              <span className="size-1.5 sm:size-2 animate-pulse rounded-full bg-accent shadow-[0_0_12px_var(--accent)]" />
               Premium coaching. Measurable momentum.
             </div>
 
             {/* Split Reveal Title */}
             <h1
               ref={headlineRef}
-              className="mt-6 font-display text-[clamp(2.5rem,6vw,4.5rem)] font-black leading-[1.05] tracking-tight text-white"
+              className="mt-3 sm:mt-4 md:mt-6 font-display text-[clamp(1.75rem,7vw,4.5rem)] font-black leading-[1.05] tracking-tight text-white"
             >
               {headlineWords.map((word, i) => (
-                <span key={i} className="inline-block overflow-hidden mr-[0.25em] pb-1.5">
+                <span key={i} className="inline-block overflow-hidden mr-[0.2em] sm:mr-[0.25em] pb-1.5">
                   <span className="hero-word inline-block origin-left">
                     {word === "Intent." || word === "Power." ? (
                       <span className="text-accent">{word}</span>
@@ -251,17 +251,17 @@ export function Hero() {
             </h1>
 
             {/* Subtitle */}
-            <p className="hero-subtitle mt-6 max-w-xl text-lg leading-relaxed text-white/75">
+            <p className="hero-subtitle mt-3 sm:mt-4 md:mt-6 max-w-xl text-sm sm:text-base md:text-lg leading-relaxed text-white/75">
               Strength, conditioning, mobility, and coaching precision for people who want a sharper body, a clearer mind, and a training room that raises the standard.
             </p>
 
             {/* CTAs with animated transitions */}
-            <div className="hero-cta-group mt-8 flex flex-wrap items-center gap-4">
-              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }}>
+            <div className="hero-cta-group mt-5 sm:mt-6 md:mt-8 flex flex-col sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 md:gap-4">
+              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
                 <Button
                   asChild
                   size="lg"
-                  className="group gap-2 rounded-full bg-accent text-accent-foreground shadow-glow hover:shadow-[0_0_24px_var(--color-accent)] transition-all font-bold"
+                  className="group gap-2 w-full sm:w-auto rounded-full bg-accent text-accent-foreground shadow-glow hover:shadow-[0_0_24px_var(--color-accent)] transition-all font-bold"
                 >
                   <Link href="#contact">
                     Book a Free Intro
@@ -270,12 +270,12 @@ export function Hero() {
                 </Button>
               </motion.div>
 
-              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }}>
+              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
                 <Button
                   asChild
                   variant="outline"
                   size="lg"
-                  className="gap-2 rounded-full border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20 transition-all"
+                  className="gap-2 w-full sm:w-auto rounded-full border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20 transition-all"
                 >
                   <Link href="#videos">
                     <PlayCircle className="size-5 text-accent" />
@@ -286,17 +286,17 @@ export function Hero() {
             </div>
 
             {/* Staggered Stats Counters */}
-            <div className="mt-12 grid grid-cols-3 gap-4 sm:gap-8 border-t border-white/10 pt-8 max-w-lg">
+            <div className="mt-6 sm:mt-8 md:mt-12 grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-8 border-t border-white/10 pt-4 sm:pt-6 md:pt-8 max-w-lg">
               {heroStats.map((stat) => (
                 <div key={stat.label} className="hero-stat text-left">
-                  <p className="text-3xl font-black text-white sm:text-4xl tracking-tight">
+                  <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight">
                     {statsVisible ? (
                       <CountUp end={stat.value} duration={2.5} suffix={stat.suffix} />
                     ) : (
                       "0"
                     )}
                   </p>
-                  <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-white/50">
+                  <p className="mt-0.5 sm:mt-1 text-[9px] sm:text-[10px] md:text-xs font-semibold uppercase tracking-wider text-white/50">
                     {stat.label}
                   </p>
                 </div>
@@ -311,11 +311,11 @@ export function Hero() {
               <motion.div
                 key={card.number}
                 style={{ x: cardsParallaxX, y: cardsParallaxY }}
-                className="hero-float-card glass-card absolute rounded-2xl p-5 text-white shadow-2xl z-20 hover:border-accent/40 transition-colors border border-white/10"
+                className="hero-float-card glass-card absolute rounded-2xl p-4 sm:p-5 text-white shadow-2xl z-20 hover:border-accent/40 transition-colors border border-white/10"
                 initial={{
                   top: i === 0 ? "8%" : "52%",
                   right: i === 0 ? "-2%" : "18%",
-                  width: i === 0 ? "16.5rem" : "15rem",
+                  width: i === 0 ? "14rem" : "13rem",
                 }}
                 animate={{ y: [0, i % 2 === 0 ? -15 : 12, 0] }}
                 transition={{
@@ -324,16 +324,16 @@ export function Hero() {
                   ease: "easeInOut",
                 }}
               >
-                <p className="font-display text-3xl font-black text-accent">{card.number}</p>
-                <p className="mt-2 font-bold text-base">{card.title}</p>
-                <p className="mt-1 text-xs text-white/70 leading-relaxed">{card.text}</p>
+                <p className="font-display text-2xl sm:text-3xl font-black text-accent">{card.number}</p>
+                <p className="mt-1.5 sm:mt-2 font-bold text-sm sm:text-base">{card.title}</p>
+                <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-white/70 leading-relaxed">{card.text}</p>
               </motion.div>
             ))}
 
             {/* Main Visual Image Frame */}
             <motion.div 
               style={{ x: textParallaxX, y: textParallaxY }}
-              className="hero-main-img relative ml-auto mr-8 mt-8 w-4/5 overflow-hidden rounded-2xl border border-white/15 shadow-2xl scale-100"
+              className="hero-main-img relative ml-auto mr-4 sm:mr-6 md:mr-8 mt-6 sm:mt-8 w-[85%] sm:w-4/5 overflow-hidden rounded-2xl border border-white/15 shadow-2xl scale-100"
             >
               <Image
                 src="/images/hero3.jpg"

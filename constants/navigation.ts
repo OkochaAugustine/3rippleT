@@ -124,6 +124,7 @@ export const adminNavigation = [
   { label: "Posts", href: "/admin/posts", icon: "Newspaper" },
   { label: "Members", href: "/admin/members", icon: "Users" },
   { label: "Notifications", href: "/admin/notifications", icon: "Bell" },
+  { label: "Emails", href: "/admin/emails", icon: "Mail" },
   { label: "Analytics", href: "/admin/analytics", icon: "BarChart3" },
   { label: "Settings", href: "/admin/settings", icon: "Settings" },
 ];

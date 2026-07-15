@@ -52,18 +52,18 @@ export function WhyChooseUs() {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   return (
-    <Section ref={ref} id="why-choose-us">
+    <Section ref={ref} id="why-choose-us" className="py-16 sm:py-20 md:py-24">
       <Container>
-        <div className="text-center mb-12">
-          <p className="text-sm font-semibold uppercase tracking-[0.36em] text-accent">
+        <div className="text-center mb-10 sm:mb-12">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.36em] text-accent">
             Why Us
           </p>
-          <Heading as="h2" size="lg" className="mt-3">
+          <Heading as="h2" size="lg" className="mt-2 sm:mt-3">
             Why Choose 3Ripple T Fitness
           </Heading>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, i) => {
             const Icon = feature.icon;
             return (
@@ -75,13 +75,13 @@ export function WhyChooseUs() {
                 whileHover={{ y: -4 }}
               >
                 <Card className="h-full">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-accent/10 mb-5">
-                    <Icon className="text-accent size-8" />
+                  <div className="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-xl bg-accent/10 mb-4 sm:mb-5">
+                    <Icon className="text-accent size-7 sm:size-8" />
                   </div>
-                  <Heading as="h3" size="sm" className="!text-xl mb-3">
+                  <Heading as="h3" size="sm" className="!text-lg sm:!text-xl mb-2 sm:mb-3">
                     {feature.title}
                   </Heading>
-                  <p className="text-muted-foreground">
+                  <p className="text-sm sm:text-base text-muted-foreground">
                     {feature.description}
                   </p>
                 </Card>

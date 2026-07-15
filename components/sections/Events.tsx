@@ -38,24 +38,24 @@ export function Events() {
     <Section
       ref={ref}
       id="events"
-      className="bg-muted/30"
+      className="bg-muted/30 py-16 sm:py-20 md:py-24"
     >
       <Container>
-        <div className="mb-12 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.36em] text-accent">
+        <div className="mb-10 sm:mb-12 text-center">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.36em] text-accent">
             Coming Up
           </p>
 
           <Heading
             as="h2"
             size="lg"
-            className="mt-3"
+            className="mt-2 sm:mt-3"
           >
             Events
           </Heading>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
           {upcomingEvents.map((event, i) => (
             <motion.div
               key={event.id}
@@ -81,7 +81,7 @@ export function Events() {
               }}
             >
               <Card className="flex h-full flex-col overflow-hidden">
-                <div className="relative mb-4 h-48 overflow-hidden rounded-lg border border-border">
+                <div className="relative mb-3 sm:mb-4 h-40 sm:h-48 overflow-hidden rounded-lg border border-border">
                   <Image
                     src={event.image}
                     alt={event.title}
@@ -94,35 +94,35 @@ export function Events() {
                 <Heading
                   as="h3"
                   size="sm"
-                  className="mb-2 !text-xl"
+                  className="mb-2 !text-lg sm:!text-xl"
                 >
                   {event.title}
                 </Heading>
 
-                <p className="mb-4 flex-1 text-muted-foreground">
+                <p className="mb-3 sm:mb-4 flex-1 text-xs sm:text-sm text-muted-foreground">
                   {event.description}
                 </p>
 
-                <div className="mb-5 space-y-3">
-                  <div className="flex items-center gap-3 text-sm">
-                    <Calendar className="h-4 w-4 shrink-0 text-accent" />
+                <div className="mb-4 sm:mb-5 space-y-2 sm:space-y-3">
+                  <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+                    <Calendar className="size-3.5 sm:size-4 shrink-0 text-accent" />
                     <span>{event.date}</span>
                   </div>
 
-                  <div className="flex items-center gap-3 text-sm">
-                    <Clock className="h-4 w-4 shrink-0 text-accent" />
+                  <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+                    <Clock className="size-3.5 sm:size-4 shrink-0 text-accent" />
                     <span>{event.time}</span>
                   </div>
 
-                  <div className="flex items-center gap-3 text-sm">
-                    <MapPin className="h-4 w-4 shrink-0 text-accent" />
+                  <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+                    <MapPin className="size-3.5 sm:size-4 shrink-0 text-accent" />
                     <span>{event.location}</span>
                   </div>
                 </div>
 
                 <Button className="mt-auto w-full gap-2">
                   Register Now
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="size-4" />
                 </Button>
               </Card>
             </motion.div>

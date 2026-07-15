@@ -1,8 +1,7 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 export type MemberStatus = "active" | "inactive" | "pending";
-export type MembershipPlan = "daily" | "monthly" | "premium";
+export type MembershipPlan = "none" | "daily" | "monthly" | "premium";
 
 export type Member = {
   id: string;
@@ -16,93 +15,99 @@ export type Member = {
   lastVisit?: string;
   attendanceCount: number;
   profileComplete: number;
+  role?: string;
+  isVerified?: boolean;
 };
 
 type MemberStore = {
   members: Member[];
-  addMember: (member: Omit<Member, "id">) => void;
-  updateMember: (id: string, member: Partial<Member>) => void;
-  deleteMember: (id: string) => void;
+  loading: boolean;
+  error: string | null;
+  fetchMembers: () => Promise<void>;
+  addMember: (member: Omit<Member, "id" | "joinedDate" | "attendanceCount" | "profileComplete">) => Promise<void>;
+  updateMember: (id: string, member: Partial<Member>) => Promise<void>;
+  deleteMember: (id: string) => Promise<void>;
 };
 
-const initialMembers: Member[] = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+234 801 234 5678",
-    status: "active",
-    plan: "monthly",
-    joinedDate: "2024-01-15",
-    expiryDate: "2024-02-15",
-    lastVisit: "2024-01-20",
-    attendanceCount: 12,
-    profileComplete: 100,
-  },
-  {
-    id: "2",
-    name: "Sarah Smith",
-    email: "sarah@example.com",
-    phone: "+234 802 345 6789",
-    status: "active",
-    plan: "premium",
-    joinedDate: "2024-02-01",
-    expiryDate: "2024-03-01",
-    lastVisit: "2024-02-10",
-    attendanceCount: 8,
-    profileComplete: 85,
-  },
-  {
-    id: "3",
-    name: "Mike Johnson",
-    email: "mike@example.com",
-    phone: "+234 803 456 7890",
-    status: "active",
-    plan: "daily",
-    joinedDate: "2024-03-10",
-    lastVisit: "2024-03-10",
-    attendanceCount: 1,
-    profileComplete: 60,
-  },
-  {
-    id: "4",
-    name: "Emily Davis",
-    email: "emily@example.com",
-    phone: "+234 804 567 8901",
-    status: "inactive",
-    plan: "monthly",
-    joinedDate: "2024-01-20",
-    expiryDate: "2024-02-20",
-    lastVisit: "2024-02-15",
-    attendanceCount: 15,
-    profileComplete: 100,
-  },
-];
+export const useMemberStore = create<MemberStore>((set) => ({
+  members: [],
+  loading: false,
+  error: null,
 
-export const useMemberStore = create<MemberStore>()(
-  persist(
-    (set) => ({
-      members: initialMembers,
-      addMember: (member) =>
-        set((state) => ({
-          members: [
-            ...state.members,
-            { ...member, id: crypto.randomUUID() },
-          ],
-        })),
-      updateMember: (id, updates) =>
-        set((state) => ({
-          members: state.members.map((member) =>
-            member.id === id ? { ...member, ...updates } : member
-          ),
-        })),
-      deleteMember: (id) =>
-        set((state) => ({
-          members: state.members.filter((member) => member.id !== id),
-        })),
-    }),
-    {
-      name: "3ripplet-members",
+  fetchMembers: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch("/api/admin/members");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to fetch members");
+      set({ members: data.members || [], loading: false });
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Something went wrong";
+      set({ error: errMsg, loading: false });
     }
-  )
-);
+  },
+
+  addMember: async (memberData) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch("/api/admin/members", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(memberData),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to add member");
+      
+      set((state) => ({
+        members: [data.member, ...state.members],
+        loading: false,
+      }));
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Failed to add member";
+      set({ error: errMsg, loading: false });
+      throw err;
+    }
+  },
+
+  updateMember: async (id, updates) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch(`/api/admin/members/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update member");
+
+      set((state) => ({
+        members: state.members.map((m) => (m.id === id ? data.member : m)),
+        loading: false,
+      }));
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Failed to update member";
+      set({ error: errMsg, loading: false });
+      throw err;
+    }
+  },
+
+  deleteMember: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch(`/api/admin/members/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to delete member");
+
+      set((state) => ({
+        members: state.members.filter((m) => m.id !== id),
+        loading: false,
+      }));
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Failed to delete member";
+      set({ error: errMsg, loading: false });
+      throw err;
+    }
+  },
+}));

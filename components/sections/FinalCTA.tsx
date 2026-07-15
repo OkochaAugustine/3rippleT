@@ -13,7 +13,7 @@ export function FinalCTA() {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   return (
-    <Section ref={ref} className="relative overflow-hidden bg-primary text-primary-foreground">
+    <Section ref={ref} className="relative overflow-hidden bg-primary text-primary-foreground py-16 sm:py-20 md:py-24">
       <div className="absolute inset-0 pointer-events-none">
         <div className="surface-grid absolute inset-0 opacity-28" />
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgb(196_255_92/0.16),transparent_42%),linear-gradient(315deg,rgb(243_107_63/0.14),transparent_38%)]" />
@@ -29,10 +29,10 @@ export function FinalCTA() {
             <Heading as="h2" size="xl">
               Ready to train with standards?
             </Heading>
-            <p className="mt-5 text-lg text-primary-foreground/70 max-w-2xl mx-auto leading-relaxed">
+            <p className="mt-4 sm:mt-5 text-base sm:text-lg text-primary-foreground/70 max-w-2xl mx-auto leading-relaxed">
               Step into 3Ripple T Fitness for a first session built around your goals, your movement, and the pace that gets you stronger without guesswork.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               <Button asChild variant="secondary" size="lg" className="gap-2">
                 <a href="#contact">
                   Book a Free Intro

@@ -2,14 +2,65 @@
 
 import { motion } from "framer-motion";
 import { LogIn } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Container } from "@/components/ui/container";
 import { Heading } from "@/components/ui/heading";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+
+      // Store in Zustand
+      login(data.user);
+
+      // Check verification status
+      if (!data.user.isVerified) {
+        router.push(`/verify?email=${encodeURIComponent(data.user.email)}`);
+        return;
+      }
+
+      // Redirect based on role
+      if (data.user.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "An error occurred. Please try again.";
+      setError(errMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Section className="min-h-screen flex items-center justify-center bg-primary text-primary-foreground">
       <Container>
@@ -31,14 +82,23 @@ export default function LoginPage() {
             Sign in to your account to access your dashboard.
           </p>
 
-          <form className="mt-8 space-y-6">
+          {error && (
+            <div className="mt-6 p-4 rounded bg-red-500/20 text-red-300 text-sm font-medium border border-red-500/30 text-center">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-semibold mb-2">
                 Email
               </label>
               <input
+                required
                 type="email"
                 id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full h-12 px-4 rounded-md border border-white/20 bg-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent"
                 placeholder="your@email.com"
               />
@@ -48,8 +108,11 @@ export default function LoginPage() {
                 Password
               </label>
               <input
+                required
                 type="password"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full h-12 px-4 rounded-md border border-white/20 bg-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent"
                 placeholder="••••••••"
               />
@@ -63,8 +126,8 @@ export default function LoginPage() {
                 Forgot password?
               </Link>
             </div>
-            <Button size="lg" className="w-full">
-              Sign In
+            <Button size="lg" className="w-full" type="submit" disabled={loading}>
+              {loading ? "Signing In..." : "Sign In"}
             </Button>
           </form>
 

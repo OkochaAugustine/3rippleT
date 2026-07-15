@@ -1,13 +1,17 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { motion } from "framer-motion";
-import { User, CreditCard, Calendar, FileText, Bell, Settings, LogOut } from "lucide-react";
+import { User, CreditCard, Calendar, FileText, Bell, Settings, LogOut, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { Container } from "@/components/ui/container";
 import { Heading } from "@/components/ui/heading";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 
 const menuItems = [
   { icon: User, label: "Profile", href: "/dashboard/profile" },
@@ -20,6 +24,34 @@ const menuItems = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { user, logout, isAuthenticated } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-accent" />
+      </div>
+    );
+  }
+
+  // Handle redirects if unauthenticated
+  if (!isAuthenticated || !user) {
+    return (
+      <Section className="bg-background min-h-screen flex items-center justify-center">
+        <Container className="text-center">
+          <p className="text-muted-foreground mb-4">You are not signed in.</p>
+          <Button onClick={() => router.push("/login")}>Sign In</Button>
+        </Container>
+      </Section>
+    );
+  }
+
   return (
     <Section className="bg-background min-h-screen">
       <Container>
@@ -29,7 +61,7 @@ export default function DashboardPage() {
           transition={{ duration: 0.6 }}
         >
           <Heading as="h1" size="xl">
-            Welcome back, <span className="text-accent">John</span>
+            Welcome back, <span className="text-accent">{user.name}</span>
           </Heading>
           <p className="mt-2 text-muted-foreground">
             Manage your fitness journey from your personal dashboard.
@@ -58,7 +90,10 @@ export default function DashboardPage() {
                     </Link>
                   );
                 })}
-                <button className="flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors">
+                <button 
+                  onClick={logout}
+                  className="flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+                >
                   <LogOut className="h-5 w-5" />
                   Sign Out
                 </button>
@@ -75,18 +110,24 @@ export default function DashboardPage() {
             <div className="grid gap-6 md:grid-cols-3">
               <div className="rounded-lg border border-border bg-card p-6">
                 <p className="text-sm text-muted-foreground">Current Plan</p>
-                <p className="mt-2 text-2xl font-bold">Premium</p>
+                <p className="mt-2 text-2xl font-bold capitalize">{user.membershipPlan || user.membership || "none"}</p>
                 <p className="mt-1 text-sm text-accent">Active</p>
               </div>
               <div className="rounded-lg border border-border bg-card p-6">
-                <p className="text-sm text-muted-foreground">Workouts This Month</p>
-                <p className="mt-2 text-2xl font-bold">24</p>
-                <p className="mt-1 text-sm text-green-500">+12% from last month</p>
+                <p className="text-sm text-muted-foreground">Account Status</p>
+                <p className="mt-2 text-2xl font-bold capitalize">
+                  {user.isVerified ? "Verified" : "Unverified"}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Joined {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Recently"}
+                </p>
               </div>
               <div className="rounded-lg border border-border bg-card p-6">
-                <p className="text-sm text-muted-foreground">Next Session</p>
-                <p className="mt-2 text-2xl font-bold">Today</p>
-                <p className="mt-1 text-sm text-muted-foreground">5:00 PM - Strength</p>
+                <p className="text-sm text-muted-foreground">Role</p>
+                <p className="mt-2 text-2xl font-bold uppercase">{user.role}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {user.phone ? `Phone: ${user.phone}` : "No phone listed"}
+                </p>
               </div>
             </div>
 
@@ -117,7 +158,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="font-semibold">Invoice Paid</p>
-                    <p className="text-sm text-muted-foreground">July 1, 2026 - $149.00</p>
+                    <p className="text-sm text-muted-foreground">July 1, 2026 - ₦20,000</p>
                   </div>
                 </div>
               </div>

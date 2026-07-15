@@ -38,25 +38,25 @@ export function Contact() {
   ];
 
   return (
-    <Section ref={ref} id="contact">
+    <Section ref={ref} id="contact" className="py-16 sm:py-20 md:py-24">
       <Container>
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
+        <div className="grid gap-10 sm:gap-12 lg:grid-cols-2 lg:items-start">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.36em] text-accent">
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.36em] text-accent">
               Get In Touch
             </p>
-            <Heading as="h2" size="lg" className="mt-3">
+            <Heading as="h2" size="lg" className="mt-2 sm:mt-3">
               Contact Us
             </Heading>
-            <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
+            <p className="mt-4 sm:mt-5 text-base sm:text-lg text-muted-foreground leading-relaxed">
               Have questions? Ready to start your fitness journey? We are here to help.
             </p>
 
-            <div className="mt-8 space-y-4">
+            <div className="mt-6 sm:mt-8 space-y-3 sm:space-y-4">
               {contactInfo.map((info, i) => {
                 const Icon = info.icon;
                 return (
@@ -65,14 +65,14 @@ export function Contact() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={inView ? { opacity: 1, x: 0 } : {}}
                     transition={{ duration: 0.5, delay: 0.3 + i * 0.1, ease: "easeOut" }}
-                    className="flex items-start gap-4 p-4 rounded-xl bg-card border border-border"
+                    className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-card border border-border"
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10 shrink-0">
-                      <Icon className="text-accent size-6" />
+                    <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-accent/10 shrink-0">
+                      <Icon className="text-accent size-5 sm:size-6" />
                     </div>
                     <div>
-                      <p className="font-semibold">{info.title}</p>
-                      <p className="text-sm text-muted-foreground whitespace-pre-line">{info.value}</p>
+                      <p className="font-semibold text-sm sm:text-base">{info.title}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground whitespace-pre-line">{info.value}</p>
                     </div>
                   </motion.div>
                 );
@@ -85,39 +85,39 @@ export function Contact() {
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
-            <Card className="p-6">
-              <form className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
+            <Card className="p-4 sm:p-6">
+              <form className="space-y-3 sm:space-y-4">
+                <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Name</label>
+                    <label className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Name</label>
                     <input
                       type="text"
-                      className="w-full h-12 rounded-lg border border-border bg-background px-4 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-accent"
+                      className="w-full h-10 sm:h-12 rounded-lg border border-border bg-background px-3 sm:px-4 text-xs sm:text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-accent"
                       placeholder="Your name"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Email</label>
+                    <label className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Email</label>
                     <input
                       type="email"
-                      className="w-full h-12 rounded-lg border border-border bg-background px-4 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-accent"
+                      className="w-full h-10 sm:h-12 rounded-lg border border-border bg-background px-3 sm:px-4 text-xs sm:text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-accent"
                       placeholder="your@email.com"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Subject</label>
+                  <label className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Subject</label>
                   <input
                     type="text"
-                    className="w-full h-12 rounded-lg border border-border bg-background px-4 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-accent"
+                    className="w-full h-10 sm:h-12 rounded-lg border border-border bg-background px-3 sm:px-4 text-xs sm:text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-accent"
                     placeholder="How can we help?"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Message</label>
+                  <label className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Message</label>
                   <textarea
-                    rows={5}
-                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-accent resize-none"
+                    rows={4}
+                    className="w-full rounded-lg border border-border bg-background px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-accent resize-none"
                     placeholder="Your message..."
                   />
                 </div>

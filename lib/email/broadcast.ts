@@ -1,4 +1,8 @@
 import type { AuthUser } from "@/store/auth-store";
+import { User } from "@/models/user";
+import { dbConnect } from "@/lib/db/mongodb";
+import { sendBroadcastEmail } from "./nodemailer";
+import { EmailLog } from "@/models/emailLog";
 
 export type BroadcastMessage = {
   id: string;
@@ -16,8 +20,20 @@ export type BroadcastPayload = {
 };
 
 export async function getRegisteredUsers(): Promise<AuthUser[]> {
-  // Production: fetch from MongoDB via API route
-  return [];
+  await dbConnect();
+  const users = await User.find({});
+  return users.map((u) => ({
+    id: u._id.toString(),
+    name: u.name,
+    email: u.email,
+    role: u.role,
+    membership: u.membership,
+    isVerified: u.isVerified,
+    verificationStatus: u.verificationStatus,
+    phone: u.phone,
+    createdAt: u.createdAt?.toISOString(),
+    profileComplete: u.phone ? 100 : 75,
+  }));
 }
 
 export async function sendBroadcast(
@@ -49,10 +65,26 @@ async function sendBulkEmail(
   subject: string,
   body: string,
 ): Promise<void> {
-  // Production: use lib/email/nodemailer.ts with batched sends
-  void recipients;
-  void subject;
-  void body;
+  for (const recipient of recipients) {
+    try {
+      await sendBroadcastEmail(recipient.email, recipient.name, subject, body);
+      await EmailLog.create({
+        recipient: recipient.email,
+        subject,
+        type: "broadcast",
+        status: "sent",
+      });
+    } catch (err: unknown) {
+      console.error(`Failed to send broadcast email to ${recipient.email}:`, err);
+      await EmailLog.create({
+        recipient: recipient.email,
+        subject,
+        type: "broadcast",
+        status: "failed",
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
 }
 
 async function createBulkNotifications(
@@ -60,7 +92,8 @@ async function createBulkNotifications(
   title: string,
   body: string,
 ): Promise<void> {
-  // Production: persist to notifications collection + push via WebSocket/SSE
+  // Notification stub: to be extended when WebSocket/SSE system is active
+  console.log(`[NOTIFICATIONS BROADCAST] Recipients: ${recipients.length} | Title: ${title}`);
   void recipients;
   void title;
   void body;

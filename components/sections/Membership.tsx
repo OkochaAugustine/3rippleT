@@ -68,28 +68,28 @@ export function Membership() {
   ];
 
   return (
-    <Section ref={ref} id="membership" className="relative bg-muted/20 py-24 overflow-hidden">
+    <Section ref={ref} id="membership" className="relative bg-muted/20 py-16 sm:py-20 md:py-24 overflow-hidden">
       {/* Background radial accent */}
       <div className="absolute bottom-0 left-0 w-[50%] h-[50%] bg-accent/5 blur-3xl pointer-events-none" aria-hidden="true" />
       
       <Container>
-        <div className="text-center mb-12 flex flex-col items-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.36em] text-accent">
+        <div className="text-center mb-10 sm:mb-12 flex flex-col items-center">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.36em] text-accent">
             Join Us
           </p>
-          <Heading as="h2" size="lg" className="mt-3">
+          <Heading as="h2" size="lg" className="mt-2 sm:mt-3">
             Membership Plans
           </Heading>
-          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="mt-3 sm:mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
             Choose the plan that fits your goals and commitment level. All plans include access to our amazing community.
           </p>
 
           {/* Animated Billing Period Switch */}
-          <div className="relative mt-10 flex items-center p-1.5 bg-card border border-border/80 rounded-full shadow-sm z-10">
+          <div className="relative mt-8 sm:mt-10 flex items-center p-1.5 bg-card border border-border/80 rounded-full shadow-sm z-10">
             <button
               type="button"
               onClick={() => setBillingPeriod("monthly")}
-              className={`relative px-6 py-2 text-sm font-bold rounded-full transition-colors duration-300 z-10 ${
+              className={`relative px-4 sm:px-6 py-2 text-xs sm:text-sm font-bold rounded-full transition-colors duration-300 z-10 ${
                 billingPeriod === "monthly" ? "text-accent-foreground" : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -105,12 +105,12 @@ export function Membership() {
             <button
               type="button"
               onClick={() => setBillingPeriod("annually")}
-              className={`relative px-6 py-2 text-sm font-bold rounded-full transition-colors duration-300 z-10 flex items-center gap-1.5 ${
+              className={`relative px-4 sm:px-6 py-2 text-xs sm:text-sm font-bold rounded-full transition-colors duration-300 z-10 flex items-center gap-1.5 ${
                 billingPeriod === "annually" ? "text-accent-foreground" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Annually
-              <span className="text-[10px] bg-accent-foreground/15 text-accent px-1.5 py-0.5 rounded-full font-extrabold uppercase">
+              <span className="text-[9px] sm:text-[10px] bg-accent-foreground/15 text-accent px-1.5 py-0.5 rounded-full font-extrabold uppercase">
                 Save 20%
               </span>
               {billingPeriod === "annually" && (
@@ -124,7 +124,7 @@ export function Membership() {
           </div>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-3 items-stretch">
+        <div className="grid gap-6 sm:gap-8 lg:grid-cols-3 items-stretch">
           {plansList.map((plan, i) => {
             const displayPrice = billingPeriod === "monthly" ? plan.monthlyPrice : plan.annualPrice;
             
@@ -153,11 +153,11 @@ export function Membership() {
                   <Heading as="h3" size="sm" className="mb-2 mt-2">
                     {plan.name}
                   </Heading>
-                  <p className="text-sm text-muted-foreground mb-6 line-clamp-2">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 line-clamp-2">
                     {plan.description}
                   </p>
 
-                  <div className="mb-6 flex flex-col justify-end min-h-16">
+                  <div className="mb-4 sm:mb-6 flex flex-col justify-end min-h-16">
                     <div className="flex items-baseline">
                       <AnimatePresence mode="wait">
                         <motion.span
@@ -166,29 +166,29 @@ export function Membership() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.25 }}
-                          className="text-5xl font-black tracking-tight"
+                          className="text-4xl sm:text-5xl font-black tracking-tight"
                         >
                           {formatNGN(displayPrice)}
                         </motion.span>
                       </AnimatePresence>
                     </div>
-                    <p className="text-muted-foreground text-xs font-semibold mt-1 uppercase tracking-wide">
+                    <p className="text-muted-foreground text-[10px] sm:text-xs font-semibold mt-1 uppercase tracking-wide">
                       {plan.periodText}
                     </p>
                   </div>
 
-                  <ul className="space-y-3.5 flex-1 mb-8 border-t border-border/60 pt-6">
+                  <ul className="space-y-3 sm:space-y-3.5 flex-1 mb-6 sm:mb-8 border-t border-border/60 pt-4 sm:pt-6">
                     {plan.features.map((feature, j) => (
                       <li key={j} className="flex items-start gap-3">
-                        <CheckCircle2 className="mt-0.5 shrink-0 text-accent size-4.5" />
-                        <span className="text-sm text-foreground/80">{feature}</span>
+                        <CheckCircle2 className="mt-0.5 shrink-0 text-accent size-4 sm:size-4.5" />
+                        <span className="text-xs sm:text-sm text-foreground/80">{feature}</span>
                       </li>
                     ))}
                   </ul>
 
                   <Button
                     variant={plan.popular ? "primary" : "outline"}
-                    className={`w-full gap-2 rounded-full font-bold py-6 transition-all duration-300 ${
+                    className={`w-full gap-2 rounded-full font-bold py-5 sm:py-6 transition-all duration-300 ${
                       plan.popular ? "bg-accent text-accent-foreground shadow-glow hover:scale-[1.02]" : "hover:bg-muted"
                     }`}
                     size="lg"

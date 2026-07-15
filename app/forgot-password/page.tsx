@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { KeyRound } from "lucide-react";
+import { useState } from "react";
 
 import { Container } from "@/components/ui/container";
 import { Heading } from "@/components/ui/heading";
@@ -10,6 +11,40 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default function ForgotPasswordPage() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to send reset link");
+      }
+
+      setSuccess(data.message);
+      setEmail("");
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "An error occurred. Please try again.";
+      setError(errMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Section className="min-h-screen flex items-center justify-center bg-primary text-primary-foreground">
       <Container>
@@ -31,20 +66,35 @@ export default function ForgotPasswordPage() {
             Enter your email address and we&apos;ll send you a link to reset your password.
           </p>
 
-          <form className="mt-8 space-y-6">
+          {error && (
+            <div className="mt-6 p-4 rounded bg-red-500/20 text-red-300 text-sm font-medium border border-red-500/30 text-center">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="mt-6 p-4 rounded bg-green-500/20 text-green-300 text-sm font-medium border border-green-500/30 text-center">
+              {success}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-semibold mb-2">
                 Email
               </label>
               <input
+                required
                 type="email"
                 id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full h-12 px-4 rounded-md border border-white/20 bg-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent"
                 placeholder="your@email.com"
               />
             </div>
-            <Button size="lg" className="w-full">
-              Send Reset Link
+            <Button size="lg" className="w-full" type="submit" disabled={loading}>
+              {loading ? "Sending..." : "Send Reset Link"}
             </Button>
           </form>
 

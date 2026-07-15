@@ -23,18 +23,18 @@ export function Testimonials() {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   return (
-    <Section ref={ref} id="success-stories" className="bg-muted/30 relative overflow-hidden">
+    <Section ref={ref} id="success-stories" className="bg-muted/30 relative overflow-hidden py-16 sm:py-20 md:py-24">
       <Container>
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.36em] text-accent">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.36em] text-accent">
             Success Stories
           </p>
-          <Heading as="h2" size="lg" className="mt-3">
+          <Heading as="h2" size="lg" className="mt-2 sm:mt-3">
             What Our Members Say
           </Heading>
         </motion.div>
@@ -53,32 +53,33 @@ export function Testimonials() {
               nextEl: ".testimonial-next",
               prevEl: ".testimonial-prev",
             }}
-            spaceBetween={24}
+            spaceBetween={16}
             slidesPerView={1}
             breakpoints={{
-              640: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
+              480: { slidesPerView: 1, spaceBetween: 16 },
+              640: { slidesPerView: 2, spaceBetween: 20 },
+              1024: { slidesPerView: 3, spaceBetween: 24 },
             }}
             className="!pb-16"
           >
             {testimonials.map((testimonial) => (
               <SwiperSlide key={testimonial.id}>
                 <motion.div
-                  whileHover={{ y: -8 }}
+                  whileHover={{ y: -6 }}
                   transition={{ duration: 0.3 }}
                 >
                   <Card className="h-full flex flex-col bg-gradient-to-br from-card to-card/50 border-border/60 shadow-xl">
-                    <Quote className="text-accent/20 mb-4" size={56} />
-                    <div className="flex gap-1 mb-4">
+                    <Quote className="text-accent/20 mb-3 sm:mb-4 size-10 sm:size-14" />
+                    <div className="flex gap-1 mb-3 sm:mb-4">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} className="text-accent fill-accent size-5" />
+                        <Star key={star} className="text-accent fill-accent size-4 sm:size-5" />
                       ))}
                     </div>
-                    <p className="text-lg italic flex-1 mb-6 leading-relaxed">
+                    <p className="text-base sm:text-lg italic flex-1 mb-4 sm:mb-6 leading-relaxed">
                       {testimonial.quote}
                     </p>
-                    <div className="flex items-center gap-4 pt-4 border-t border-border/40">
-                      <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-accent/20 shrink-0">
+                    <div className="flex items-center gap-3 sm:gap-4 pt-3 sm:pt-4 border-t border-border/40">
+                      <div className="relative h-12 w-12 sm:h-14 sm:w-14 overflow-hidden rounded-full border-2 border-accent/20 shrink-0">
                         <Image
                           src={testimonial.image}
                           alt={testimonial.name}
@@ -87,8 +88,8 @@ export function Testimonials() {
                         />
                       </div>
                       <div>
-                        <p className="font-semibold text-base">{testimonial.name}</p>
-                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                        <p className="font-semibold text-sm sm:text-base">{testimonial.name}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">{testimonial.role}</p>
                       </div>
                     </div>
                   </Card>

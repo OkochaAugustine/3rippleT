@@ -151,7 +151,7 @@ export function SiteHeader() {
               transition={{ duration: 0.4 }}
             >
               <Image
-                src="/images/placeholders/logo.svg"
+                src="/images/logo.png"
                 alt=""
                 fill
                 className="object-contain p-1.5"

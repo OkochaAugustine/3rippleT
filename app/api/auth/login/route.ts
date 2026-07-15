@@ -39,7 +39,9 @@ export async function POST(req: Request) {
     // Sign token
     const token = signToken({
       userId: user._id.toString(),
+      id: user._id.toString(),
       email: user.email,
+      name: user.name,
       role: user.role,
     });
 

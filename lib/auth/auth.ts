@@ -5,7 +5,9 @@ const JWT_SECRET = process.env.JWT_SECRET || "3ripplet-fitness-secret-key-change
 
 export type TokenPayload = {
   userId: string;
+  id: string;
   email: string;
+  name: string;
   role: "MEMBER" | "ADMIN" | "COACH";
 };
 

@@ -9,21 +9,20 @@ export type HeroSlide = {
 export const heroSlides: HeroSlide[] = [
   {
     id: "1",
-    type: "video",
-    src: "/videos/hero.mp4",
+    type: "image",
+    src: "/images/hero.jpg",
     alt: "3Ripple T Fitness training floor",
-    poster: "/images/placeholders/hero-bg.svg",
   },
   {
     id: "2",
     type: "image",
-    src: "/images/placeholders/gym-1.svg",
+    src: "/images/training-floor.jpg",
     alt: "Athletes training together",
   },
   {
     id: "3",
     type: "image",
-    src: "/images/placeholders/gym-3.svg",
+    src: "/images/hero3.jpg",
     alt: "Strength and conditioning session",
   },
 ];

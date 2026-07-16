@@ -58,7 +58,7 @@ export function SiteHeader() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [programsOpen, setProgramsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  
+
   // Custom navigation interactions
   const [scrolled, setScrolled] = useState(false);
   const [showNavbar, setShowNavbar] = useState(true);
@@ -68,6 +68,28 @@ export function SiteHeader() {
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 0);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  // Handle Escape key to close menu
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   const [prevPathname, setPrevPathname] = useState(pathname);
@@ -117,15 +139,14 @@ export function SiteHeader() {
   const isDashboard = pathname.startsWith("/dashboard") || pathname.startsWith("/admin");
   if (isDashboard) return null;
 
-  // Decide colors based on transparent or scrolled states
-  // Since all page heroes have dark layouts/gradients, force white elements at scrollY === 0
-  const textColorClass = scrolled
-    ? "text-foreground hover:text-accent"
-    : "text-white/80 hover:text-white";
-
-  const activeTextColorClass = scrolled
-    ? "text-accent"
-    : "text-white";
+  // Navbar stays transparent in every state — a soft drop-shadow on the
+  // text (not a solid fill behind it) is what keeps things legible over
+  // any hero media, and a faint glass tint appears only once scrolled.
+  // Nav links are green (brand accent) in both active and inactive states.
+  // The "!" prefix forces this to win the cascade against any other global
+  // rule (e.g. a scoped stylesheet elsewhere that used to force white text).
+  const textColorClass = "!text-accent [text-shadow:0_1px_8px_rgba(0,0,0,0.85)]";
+  const activeTextColorClass = "!text-accent [text-shadow:0_1px_8px_rgba(0,0,0,0.85)]";
 
   return (
     <>
@@ -134,42 +155,43 @@ export function SiteHeader() {
           "fixed z-50 transition-all duration-500 ease-out",
           showNavbar ? "translate-y-0" : "-translate-y-full",
           scrolled
-            ? "top-4 left-4 right-4 mx-auto max-w-5xl rounded-full border border-border/40 bg-card/85 px-4 shadow-xl backdrop-blur-xl"
-            : "top-0 left-0 right-0 w-full border-b border-white/5 bg-transparent px-0"
+            ? "top-4 left-4 right-4 mx-auto max-w-6xl rounded-2xl border border-white/10 bg-white/[0.06] px-6 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.6)] backdrop-blur-2xl"
+            : "top-0 left-0 right-0 w-full bg-transparent px-0"
         )}
       >
-        <Container className="flex h-[4.5rem] items-center justify-between gap-4">
+        {/* Faint top-down scrim — invisible on its own, but keeps text
+            readable over bright hero media without ever reading as a
+            solid bar. Fades away once the glass pill takes over on scroll. */}
+        {!scrolled && (
+          <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-32 bg-gradient-to-b from-black/50 via-black/10 to-transparent" />
+        )}
+
+        <Container className="flex h-20 items-center justify-between gap-4">
           {/* Brand Logo & Name */}
           <Link
             href="/"
             className="group flex shrink-0 items-center gap-3"
             aria-label={`${siteConfig.name} home`}
           >
-            <motion.div 
-              className="relative h-11 w-11 overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm"
+            <motion.div
+              className="relative h-20 w-20 shrink-0 drop-shadow-[0_2px_14px_rgba(0,0,0,0.7)] sm:h-24 sm:w-24"
               whileHover={{ scale: 1.08, rotate: [0, -6, 6, 0] }}
               transition={{ duration: 0.4 }}
             >
               <Image
                 src="/images/logo.png"
-                alt=""
+                alt={siteConfig.name}
                 fill
-                className="object-contain p-1.5"
+                sizes="(min-width: 640px) 96px, 80px"
+                priority
+                className="object-contain"
               />
             </motion.div>
-            <span
-              className={cn(
-                "hidden font-display text-sm font-black leading-tight tracking-tight sm:block transition-colors duration-300",
-                scrolled ? "text-foreground" : "text-white"
-              )}
-            >
-              {siteConfig.name}
-            </span>
           </Link>
 
           {/* Desktop Navigation Link Menu */}
           <nav
-            className="hidden items-center gap-1.5 xl:flex"
+            className="hidden items-center gap-2 lg:flex"
             aria-label="Main navigation"
           >
             {siteNavigation.map((item) => {
@@ -188,15 +210,15 @@ export function SiteHeader() {
                     <Link
                       href={item.href}
                       className={cn(
-                        "nav-link-glow group relative flex items-center gap-1 rounded-full px-3.5 py-2 text-sm font-semibold transition-all duration-300",
+                        "nav-link-glow group relative flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300",
                         isActive ? activeTextColorClass : textColorClass
                       )}
                     >
-                      <span className="relative z-10 flex items-center gap-1">
+                      <span className="relative z-10 flex items-center gap-1.5">
                         {item.label}
                         <ChevronDown
                           className={cn(
-                            "size-3.5 transition-transform duration-300",
+                            "size-4 transition-transform duration-300",
                             programsOpen && "rotate-180"
                           )}
                         />
@@ -206,10 +228,7 @@ export function SiteHeader() {
                       {isActive && (
                         <motion.span
                           layoutId="activeNavBackground"
-                          className={cn(
-                            "absolute inset-0 -z-10 rounded-full",
-                            scrolled ? "bg-accent/10" : "bg-white/15"
-                          )}
+                          className="absolute inset-0 -z-10 rounded-xl bg-white/10"
                           transition={{ type: "spring", stiffness: 380, damping: 30 }}
                         />
                       )}
@@ -223,16 +242,16 @@ export function SiteHeader() {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 8, scale: 0.98 }}
                           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                          className="absolute left-1/2 top-full z-50 mt-2 w-[38rem] -translate-x-1/2 overflow-hidden rounded-2xl border border-border/60 bg-card/95 p-4 shadow-2xl backdrop-blur-xl"
+                          className="absolute left-1/2 top-full z-50 mt-2 w-[42rem] -translate-x-1/2 overflow-hidden rounded-2xl border border-white/10 bg-black/95 p-5 shadow-2xl backdrop-blur-2xl"
                         >
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid grid-cols-2 gap-4">
                             {item.megaMenu.map((program) => (
                               <Link
                                 key={program.href}
                                 href={program.href}
-                                className="group flex gap-3 rounded-xl p-3 transition-colors hover:bg-muted/80"
+                                className="group flex gap-4 rounded-xl p-4 transition-all hover:bg-white/10"
                               >
-                                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
+                                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
                                   <Image
                                     src={program.image}
                                     alt={program.title}
@@ -241,15 +260,15 @@ export function SiteHeader() {
                                   />
                                 </div>
                                 <div>
-                                  <p className="text-sm font-bold">{program.title}</p>
-                                  <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                                  <p className="text-sm font-bold text-white">{program.title}</p>
+                                  <p className="mt-1 text-xs text-white/60 line-clamp-2">
                                     {program.description}
                                   </p>
                                 </div>
                               </Link>
                             ))}
                           </div>
-                          <div className="mt-3 border-t border-border/60 pt-3">
+                          <div className="mt-4 border-t border-white/10 pt-4">
                             <Link
                               href="/programs"
                               className="text-sm font-semibold text-accent hover:underline"
@@ -269,20 +288,17 @@ export function SiteHeader() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "nav-link-glow group relative rounded-full px-3.5 py-2 text-sm font-semibold transition-all duration-300",
+                    "nav-link-glow group relative rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300",
                     isActive ? activeTextColorClass : textColorClass
                   )}
                 >
                   <span className="relative z-10">{item.label}</span>
-                  
+
                   {/* Pill active slide indicator */}
                   {isActive && (
                     <motion.span
                       layoutId="activeNavBackground"
-                      className={cn(
-                        "absolute inset-0 -z-10 rounded-full",
-                        scrolled ? "bg-accent/10" : "bg-white/15"
-                      )}
+                      className="absolute inset-0 -z-10 rounded-xl bg-white/10"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -298,10 +314,7 @@ export function SiteHeader() {
               type="button"
               variant="ghost"
               size="icon"
-              className={cn(
-                "rounded-full hover:bg-muted/60 transition-colors",
-                scrolled ? "text-foreground" : "text-white/80 hover:text-white"
-              )}
+              className="rounded-xl text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.85)] transition-colors hover:bg-white/10 hover:text-white"
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
             >
@@ -314,10 +327,7 @@ export function SiteHeader() {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className={cn(
-                  "rounded-full hover:bg-muted/60 transition-colors",
-                  scrolled ? "text-foreground" : "text-white/80 hover:text-white"
-                )}
+                className="rounded-xl text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.85)] transition-colors hover:bg-white/10 hover:text-white"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 aria-label="Toggle theme"
               >
@@ -342,10 +352,7 @@ export function SiteHeader() {
                 <button
                   type="button"
                   onClick={() => setProfileOpen((v) => !v)}
-                  className={cn(
-                    "flex items-center gap-2 rounded-full border border-border/60 py-1.5 pl-1.5 pr-3 transition-colors",
-                    scrolled ? "bg-muted/40 hover:bg-muted/70" : "bg-white/10 hover:bg-white/20 text-white"
-                  )}
+                  className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 py-1.5 pl-1.5 pr-3 text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)] transition-colors hover:bg-white/20"
                   aria-expanded={profileOpen}
                   aria-haspopup="true"
                 >
@@ -405,30 +412,24 @@ export function SiteHeader() {
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="hidden lg:flex items-center gap-2">
+              <div className="hidden items-center gap-2 lg:flex">
                 {/* Explicit Login CTA */}
                 <Button
                   asChild
                   variant="ghost"
                   size="sm"
-                  className={cn(
-                    "rounded-full px-4 font-semibold hover:bg-muted/20 transition-all duration-300",
-                    scrolled ? "text-foreground" : "text-white/90 hover:text-white"
-                  )}
+                  className="rounded-full px-4 font-semibold text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.85)] transition-all duration-300 hover:bg-white/10 hover:text-white"
                 >
                   <Link href="/login">Sign In</Link>
                 </Button>
 
                 {/* Primary Join CTA with premium animations */}
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                >
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     asChild
                     variant="primary"
                     size="sm"
-                    className="rounded-full bg-accent font-bold text-accent-foreground shadow-glow hover:shadow-[0_0_20px_var(--color-accent)] transition-all"
+                    className="rounded-full bg-accent font-bold text-accent-foreground shadow-glow transition-all hover:shadow-[0_0_20px_var(--color-accent)]"
                   >
                     <Link href={isHome ? "#contact" : "/register"}>
                       Join Now
@@ -443,10 +444,7 @@ export function SiteHeader() {
               type="button"
               variant="ghost"
               size="icon"
-              className={cn(
-                "rounded-full xl:hidden transition-colors z-50",
-                scrolled || isOpen ? "text-foreground" : "text-white/80 hover:text-white"
-              )}
+              className="z-[100] rounded-full text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.85)] transition-colors xl:hidden"
               aria-label={isOpen ? "Close menu" : "Open menu"}
               aria-expanded={isOpen}
               onClick={() => setIsOpen((v) => !v)}
@@ -455,18 +453,28 @@ export function SiteHeader() {
             </Button>
           </div>
         </Container>
+      </header>
 
-        {/* Premium Full-Screen/Drawer Mobile Menu */}
-        <AnimatePresence>
-          {isOpen ? (
+      {/* Premium Full-Screen/Drawer Mobile Menu */}
+      <AnimatePresence>
+        {isOpen ? (
+          <>
+            {/* Backdrop */}
             <motion.div
-              initial={{ opacity: 0, y: "-100%" }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: "-100%" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm xl:hidden"
+            />
+            <motion.div
+              initial={{ opacity: 0, x: "100%" }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: "100%" }}
               transition={{ type: "spring", damping: 26, stiffness: 220 }}
-              className="fixed inset-0 z-40 flex flex-col bg-background/95 backdrop-blur-2xl xl:hidden pt-[5.5rem] px-6 pb-8 overflow-y-auto"
+              className="fixed inset-y-0 right-0 z-[70] flex w-full max-w-sm flex-col overflow-y-auto bg-background px-6 pb-8 pt-[5.5rem] backdrop-blur-2xl xl:hidden"
             >
-              <nav className="flex flex-col gap-3 mt-4" aria-label="Mobile navigation">
+              <nav className="mt-4 flex flex-col gap-3" aria-label="Mobile navigation">
                 {siteNavigation.map((item, index) => (
                   <motion.div
                     key={item.href}
@@ -478,7 +486,7 @@ export function SiteHeader() {
                       href={item.href}
                       onClick={() => setIsOpen(false)}
                       className={cn(
-                        "flex items-center text-xl font-black py-2.5 transition-colors",
+                        "flex items-center py-2.5 text-xl font-black transition-colors",
                         pathname === item.href
                           ? "text-accent"
                           : "text-foreground hover:text-accent"
@@ -487,13 +495,13 @@ export function SiteHeader() {
                       {item.label}
                     </Link>
                     {item.megaMenu ? (
-                      <div className="ml-3 pl-3 space-y-1.5 border-l border-border/60">
+                      <div className="ml-3 space-y-1.5 border-l border-border/60 pl-3">
                         {item.megaMenu.map((program) => (
                           <Link
                             key={program.href}
                             href={program.href}
                             onClick={() => setIsOpen(false)}
-                            className="block py-1 text-xs font-semibold text-muted-foreground hover:text-accent transition-colors"
+                            className="block py-1 text-xs font-semibold text-muted-foreground transition-colors hover:text-accent"
                           >
                             {program.title}
                           </Link>
@@ -509,7 +517,7 @@ export function SiteHeader() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.3 }}
-                className="mt-auto border-t border-border/40 pt-6 flex flex-col gap-3"
+                className="mt-auto flex flex-col gap-3 border-t border-border/40 pt-6"
               >
                 {!isAuthenticated && (
                   <Button asChild variant="outline" size="lg" className="w-full rounded-full">
@@ -521,7 +529,7 @@ export function SiteHeader() {
                 <Button
                   asChild
                   size="lg"
-                  className="w-full rounded-full bg-accent text-accent-foreground shadow-glow font-bold"
+                  className="w-full rounded-full bg-accent font-bold text-accent-foreground shadow-glow"
                 >
                   <Link href={isHome ? "#contact" : "/register"} onClick={() => setIsOpen(false)}>
                     Join Now
@@ -529,9 +537,9 @@ export function SiteHeader() {
                 </Button>
               </motion.div>
             </motion.div>
-          ) : null}
-        </AnimatePresence>
-      </header>
+          </>
+        ) : null}
+      </AnimatePresence>
 
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>

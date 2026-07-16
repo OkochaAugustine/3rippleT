@@ -1,124 +1,104 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion, useMotionValue, useSpring, useTransform, useScroll } from "framer-motion";
-import { ArrowRight, ChevronDown, PlayCircle } from "lucide-react";
-import CountUp from "react-countup";
-import { Autoplay, EffectFade } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
+import { ArrowUpRight, ChevronDown, Flame, Users } from "lucide-react";
 
-import { heroSlides, heroStats } from "@/data/hero";
 import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
 
-import "swiper/css";
-import "swiper/css/effect-fade";
-
-const floatingCards = [
-  {
-    number: "01",
-    title: "Assessment first",
-    text: "Every athlete starts with movement, goals, and coach fit.",
-  },
-  {
-    number: "02",
-    title: "Precision coaching",
-    text: "Technique, progression, and accountability at every session.",
-  },
+// Green clauses are the "why", the white clause is the "what" — two-tone
+// treatment, revealed word by word on load.
+const headlineWords = [
+  { text: "TRAIN", accent: true },
+  { text: "HARD.", accent: true },
+  { text: "LIVE", accent: true },
+  { text: "STRONG.", accent: true },
+  { text: "UNLEASH", accent: false },
+  { text: "YOUR", accent: false },
+  { text: "POWER.", accent: false },
 ];
+
+const marqueeWords = ["STRENGTH", "CONDITIONING", "MOBILITY", "RECOVERY", "PRECISION"];
+
+// Circular seal copy — rendered on an SVG textPath so it can spin forever
+// without ever looking stretched or blurry.
+const SEAL_TEXT = "CERTIFIED COACHING • REAL RESULTS • ";
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
-  const [statsVisible, setStatsVisible] = useState(false);
 
-  // Scroll opacity for scroll indicator and orbs
   const { scrollY } = useScroll();
   const scrollIndicatorOpacity = useTransform(scrollY, [0, 100], [1, 0]);
 
-  // Mouse Parallax values
+  // Mouse-driven values power the parallax text, the background spotlight,
+  // and a subtle 3D tilt on the side visual.
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const springX = useSpring(mouseX, { stiffness: 60, damping: 20 });
   const springY = useSpring(mouseY, { stiffness: 60, damping: 20 });
-  
-  // Parallax offsets for different layers
+
   const textParallaxX = useTransform(springX, [-0.5, 0.5], [-8, 8]);
   const textParallaxY = useTransform(springY, [-0.5, 0.5], [-5, 5]);
+  const orbParallaxX = useTransform(springX, [-0.5, 0.5], [-25, 25]);
+  const orbParallaxY = useTransform(springY, [-0.5, 0.5], [-20, 20]);
 
-  const backgroundParallaxX = useTransform(springX, [-0.5, 0.5], [-25, 25]);
-  const backgroundParallaxY = useTransform(springY, [-0.5, 0.5], [-20, 20]);
+  const spotlightX = useTransform(springX, [-0.5, 0.5], ["20%", "80%"]);
+  const spotlightY = useTransform(springY, [-0.5, 0.5], ["20%", "80%"]);
+  const spotlightBackground = useTransform(
+    [spotlightX, spotlightY],
+    ([x, y]) => `radial-gradient(600px circle at ${x} ${y}, var(--accent) 0%, transparent 70%)`
+  );
 
-  const cardsParallaxX = useTransform(springX, [-0.5, 0.5], [20, -20]);
-  const cardsParallaxY = useTransform(springY, [-0.5, 0.5], [15, -15]);
+  // Visual card tilts opposite to the mouse-driven text for a light
+  // parallax-depth effect between the two columns.
+  const visualRotateY = useTransform(springX, [-0.5, 0.5], [8, -8]);
+  const visualRotateX = useTransform(springY, [-0.5, 0.5], [-6, 6]);
+  const chipParallaxX = useTransform(springX, [-0.5, 0.5], [10, -10]);
+  const chipParallaxY = useTransform(springY, [-0.5, 0.5], [8, -8]);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ 
-        defaults: { ease: "power4.out" },
-        onComplete: () => setStatsVisible(true) 
-      });
+      const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
 
-      // Split text reveal
       if (headlineRef.current) {
         const words = headlineRef.current.querySelectorAll(".hero-word");
-        tl.fromTo(words, 
+        tl.fromTo(
+          words,
           { y: "110%", opacity: 0, rotate: 3 },
-          {
-            y: "0%",
-            opacity: 1,
-            rotate: 0,
-            stagger: 0.08,
-            duration: 1.2,
-            transformOrigin: "0% 50%",
-          }
+          { y: "0%", opacity: 1, rotate: 0, stagger: 0.07, duration: 1.1, transformOrigin: "0% 50%" }
         );
       }
 
+      tl.fromTo(".hero-badge", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, "-=0.9");
+      tl.fromTo(".hero-subtitle", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, "-=0.7");
+      tl.fromTo(".hero-cta-group", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, "-=0.6");
+      tl.fromTo(".hero-grid", { opacity: 0 }, { opacity: 1, duration: 1.4 }, 0);
       tl.fromTo(
-        ".hero-badge",
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8 },
-        "-=0.9"
-      );
-      tl.fromTo(
-        ".hero-subtitle",
-        { y: 24, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8 },
-        "-=0.7"
-      );
-      tl.fromTo(
-        ".hero-cta-group",
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.7 },
-        "-=0.6"
-      );
-      tl.fromTo(
-        ".hero-stat",
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.08, duration: 0.7 },
-        "-=0.5"
-      );
-      tl.fromTo(
-        ".hero-float-card",
-        { x: 50, opacity: 0 },
-        { x: 0, opacity: 1, stagger: 0.15, duration: 0.9 },
-        "-=0.6"
-      );
-      tl.fromTo(
-        ".hero-main-img",
-        { scale: 0.92, opacity: 0 },
+        ".hero-visual",
+        { scale: 0.9, opacity: 0 },
         { scale: 1, opacity: 1, duration: 1.1 },
         "-=0.8"
       );
+      tl.fromTo(
+        ".hero-chip",
+        { y: 24, opacity: 0 },
+        { y: 0, opacity: 1, stagger: 0.15, duration: 0.8 },
+        "-=0.6"
+      );
+      tl.fromTo(
+        ".hero-bottom-bar",
+        { scaleX: 0 },
+        { scaleX: 1, duration: 1.1, transformOrigin: "0% 50%" },
+        "-=0.4"
+      );
 
-      // Bounce scroll indicator
       gsap.to(".hero-scroll-indicator", {
         y: 6,
         repeat: -1,
@@ -126,6 +106,19 @@ export function Hero() {
         duration: 1.5,
         ease: "sine.inOut",
       });
+
+      // Slow, constant spin for the seal badge — independent of the intro
+      // timeline so it never stops.
+      gsap.to(".hero-seal", {
+        rotate: 360,
+        duration: 18,
+        repeat: -1,
+        ease: "linear",
+      });
+
+      // Gentle vertical drift for the floating chips.
+      gsap.to(".hero-chip-top", { y: -10, duration: 3.4, repeat: -1, yoyo: true, ease: "sine.inOut" });
+      gsap.to(".hero-chip-bottom", { y: 10, duration: 3.8, repeat: -1, yoyo: true, ease: "sine.inOut" });
     }, sectionRef);
 
     return () => ctx.revert();
@@ -138,226 +131,222 @@ export function Hero() {
     mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
   };
 
-  const headlineWords = ["Train", "with", "Intent.", "Move", "with", "Power."];
-
   return (
     <section
       ref={sectionRef}
       id="hero"
-      className="relative flex min-h-dvh items-center overflow-hidden pt-[4.5rem] bg-black"
+      className="relative flex min-h-dvh items-center overflow-hidden bg-black"
       onMouseMove={handleMouseMove}
     >
-      {/* Background Media Layer */}
-      <motion.div 
-        style={{ x: backgroundParallaxX, y: backgroundParallaxY }}
-        className="absolute inset-0 scale-105"
-      >
-        <Swiper
-          modules={[Autoplay, EffectFade]}
-          effect="fade"
-          autoplay={{ delay: 6000, disableOnInteraction: false }}
-          loop
-          speed={1500}
-          className="h-full w-full"
-        >
-          {heroSlides.map((slide) => (
-            <SwiperSlide key={slide.id}>
-              {slide.type === "video" ? (
-                <div className="relative h-full w-full overflow-hidden">
-                  <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    poster={slide.poster}
-                    className="h-full w-full object-cover"
-                  >
-                    <source src={slide.src} type="video/mp4" />
-                  </video>
-                </div>
-              ) : (
-                <div className="relative h-full w-full">
-                  <Image
-                    src={slide.src}
-                    alt={slide.alt}
-                    fill
-                    className="object-cover"
-                    sizes="100vw"
-                    priority={slide.id === "1"}
-                  />
-                </div>
-              )}
-            </SwiperSlide>
-          ))}
-        </Swiper>
-        {/* Layered overlay gradients for high cinematic immersion */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/35" />
-      </motion.div>
-
-      {/* Floating Geometric accent elements */}
-      <div className="pointer-events-none absolute inset-0 z-10" aria-hidden="true">
-        {/* Circle wireframe */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-          className="absolute right-10 top-1/4 size-80 rounded-full border border-white/5 opacity-30 hidden lg:block"
-        />
-        {/* Abstract crosshair grids */}
-        <div className="absolute left-[8%] bottom-[12%] size-12 border-l border-b border-white/10 opacity-40 hidden md:block" />
-        <div className="absolute right-[12%] top-[12%] size-16 border-r border-t border-white/10 opacity-40 hidden md:block" />
-      </div>
-
-      {/* Ambient Gradient Orbs */}
-      <motion.div
-        style={{ x: textParallaxX, y: textParallaxY }}
-        className="hero-gradient-orb absolute -left-32 top-1/4 size-96 bg-accent/20"
-      />
-      <motion.div
-        style={{ x: cardsParallaxX }}
-        className="hero-gradient-orb absolute -right-24 bottom-1/4 size-80 bg-secondary/15 [animation-delay:4s]"
+      {/* Fine structural grid — reads as a training-room floor plan rather
+          than decoration */}
+      <div
+        className="hero-grid pointer-events-none absolute inset-0 opacity-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+        }}
       />
 
-      <Container className="relative z-10 py-8 sm:py-12 md:py-16 lg:py-24">
-        <div className="grid gap-6 sm:gap-8 lg:gap-12 lg:grid-cols-12 lg:items-center">
-          
-          {/* Hero Left Content Column */}
-          <motion.div 
-            style={{ x: textParallaxX, y: textParallaxY }}
-            className="lg:col-span-7"
-          >
-            {/* Tag Badge */}
-            <div className="hero-badge inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 sm:px-3.5 sm:py-1.5 md:px-4 md:py-2 text-[10px] sm:text-xs md:text-sm font-semibold text-white/90 backdrop-blur-md">
+      {/* Cursor-tracked spotlight */}
+      <motion.div
+        aria-hidden
+        style={{ background: spotlightBackground }}
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+      />
+
+      {/* Ambient accent orbs */}
+      <motion.div
+        style={{ x: orbParallaxX, y: orbParallaxY }}
+        className="pointer-events-none absolute -left-32 top-1/4 size-96 rounded-full bg-accent/15 blur-3xl"
+      />
+      <motion.div
+        style={{ x: useTransform(orbParallaxX, (v) => -v) }}
+        className="pointer-events-none absolute -right-24 bottom-1/4 size-80 rounded-full bg-accent/10 blur-3xl"
+      />
+
+      {/* Vignette to keep the edges quiet under the grid + spotlight */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,black_100%)]" />
+
+      <Container className="relative z-10 py-8 sm:py-12 md:py-16 lg:py-20">
+        <div className="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-8">
+          {/* Left — copy */}
+          <div className="lg:col-span-7">
+            <div className="hero-badge inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[10px] sm:text-xs md:text-sm font-semibold text-white/90 backdrop-blur-md">
               <span className="size-1.5 sm:size-2 animate-pulse rounded-full bg-accent shadow-[0_0_12px_var(--accent)]" />
               Premium coaching. Measurable momentum.
             </div>
 
-            {/* Split Reveal Title */}
-            <h1
+            <motion.h1
               ref={headlineRef}
-              className="mt-3 sm:mt-4 md:mt-6 font-display text-[clamp(1.75rem,7vw,4.5rem)] font-black leading-[1.05] tracking-tight text-white"
+              style={{ x: textParallaxX, y: textParallaxY }}
+              className="mt-4 sm:mt-6 font-display text-[clamp(2rem,6vw,4.75rem)] font-black uppercase leading-[1.05] tracking-tight text-white"
             >
               {headlineWords.map((word, i) => (
-                <span key={i} className="inline-block overflow-hidden mr-[0.2em] sm:mr-[0.25em] pb-1.5">
-                  <span className="hero-word inline-block origin-left">
-                    {word === "Intent." || word === "Power." ? (
-                      <span className="text-accent">{word}</span>
-                    ) : (
-                      word
-                    )}
+                <span key={i} className="inline-block overflow-hidden mr-[0.22em] pb-1.5">
+                  <span
+                    className={`hero-word inline-block origin-left ${
+                      word.accent ? "text-accent" : "text-white"
+                    }`}
+                  >
+                    {word.text}
                   </span>
                 </span>
               ))}
-            </h1>
+            </motion.h1>
 
-            {/* Subtitle */}
-            <p className="hero-subtitle mt-3 sm:mt-4 md:mt-6 max-w-xl text-sm sm:text-base md:text-lg leading-relaxed text-white/75">
-              Strength, conditioning, mobility, and coaching precision for people who want a sharper body, a clearer mind, and a training room that raises the standard.
+            <p className="hero-subtitle mt-4 sm:mt-6 max-w-lg text-sm sm:text-base md:text-lg leading-relaxed text-white/75">
+              Modern fitness programs and expert coaching designed to help you
+              transform your body, elevate your mindset, and achieve lasting
+              results.
             </p>
 
-            {/* CTAs with animated transitions */}
-            <div className="hero-cta-group mt-5 sm:mt-6 md:mt-8 flex flex-col sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 md:gap-4">
-              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
-                <Button
-                  asChild
-                  size="lg"
-                  className="group gap-2 w-full sm:w-auto rounded-full bg-accent text-accent-foreground shadow-glow hover:shadow-[0_0_24px_var(--color-accent)] transition-all font-bold"
+            <div className="hero-cta-group mt-6 sm:mt-8 flex items-center gap-4">
+              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+                <Link
+                  href="#contact"
+                  className="group flex items-center gap-3 rounded-full bg-accent py-2 pl-6 pr-2 font-bold text-black shadow-glow transition-shadow hover:shadow-[0_0_28px_var(--accent)]"
                 >
-                  <Link href="#contact">
-                    Book a Free Intro
-                    <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-              </motion.div>
-
-              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
-                <Button
-                  asChild
-                  variant="outline"
-                  size="lg"
-                  className="gap-2 w-full sm:w-auto rounded-full border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20 transition-all"
-                >
-                  <Link href="#videos">
-                    <PlayCircle className="size-5 text-accent" />
-                    Watch Training
-                  </Link>
-                </Button>
+                  Join Now
+                  <span className="flex size-9 items-center justify-center rounded-full bg-black text-accent transition-transform duration-300 group-hover:rotate-45">
+                    <ArrowUpRight className="size-4" />
+                  </span>
+                </Link>
               </motion.div>
             </div>
+          </div>
 
-            {/* Staggered Stats Counters */}
-            <div className="mt-6 sm:mt-8 md:mt-12 grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-8 border-t border-white/10 pt-4 sm:pt-6 md:pt-8 max-w-lg">
-              {heroStats.map((stat) => (
-                <div key={stat.label} className="hero-stat text-left">
-                  <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight">
-                    {statsVisible ? (
-                      <CountUp end={stat.value} duration={2.5} suffix={stat.suffix} />
-                    ) : (
-                      "0"
-                    )}
-                  </p>
-                  <p className="mt-0.5 sm:mt-1 text-[9px] sm:text-[10px] md:text-xs font-semibold uppercase tracking-wider text-white/50">
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Hero Right Column: Floating Visual Cards */}
+          {/* Right — framed visual */}
           <div className="relative hidden lg:col-span-5 lg:block">
-            {/* Interactive Cards */}
-            {floatingCards.map((card, i) => (
-              <motion.div
-                key={card.number}
-                style={{ x: cardsParallaxX, y: cardsParallaxY }}
-                className="hero-float-card glass-card absolute rounded-2xl p-4 sm:p-5 text-white shadow-2xl z-20 hover:border-accent/40 transition-colors border border-white/10"
-                initial={{
-                  top: i === 0 ? "8%" : "52%",
-                  right: i === 0 ? "-2%" : "18%",
-                  width: i === 0 ? "14rem" : "13rem",
-                }}
-                animate={{ y: [0, i % 2 === 0 ? -15 : 12, 0] }}
-                transition={{
-                  duration: 5 + i * 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                <p className="font-display text-2xl sm:text-3xl font-black text-accent">{card.number}</p>
-                <p className="mt-1.5 sm:mt-2 font-bold text-sm sm:text-base">{card.title}</p>
-                <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-white/70 leading-relaxed">{card.text}</p>
-              </motion.div>
-            ))}
+            {/* Rotating certification seal, clipped to the top-right of the frame */}
+            <div className="hero-seal-wrap absolute -right-6 -top-6 z-30 size-24">
+              <svg viewBox="0 0 100 100" className="hero-seal size-24">
+                <defs>
+                  <path id="seal-circle" d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" />
+                </defs>
+                <circle cx="50" cy="50" r="38" fill="black" stroke="var(--accent)" strokeWidth="1" opacity="0.5" />
+                <text fill="var(--accent)" fontSize="7.2" fontWeight="700" letterSpacing="1">
+                  <textPath href="#seal-circle" startOffset="0%">
+                    {SEAL_TEXT}
+                  </textPath>
+                </text>
+              </svg>
+              <span className="absolute inset-0 m-auto flex size-9 items-center justify-center rounded-full bg-accent text-black">
+                <Flame className="size-4" />
+              </span>
+            </div>
 
-            {/* Main Visual Image Frame */}
-            <motion.div 
-              style={{ x: textParallaxX, y: textParallaxY }}
-              className="hero-main-img relative ml-auto mr-4 sm:mr-6 md:mr-8 mt-6 sm:mt-8 w-[85%] sm:w-4/5 overflow-hidden rounded-2xl border border-white/15 shadow-2xl scale-100"
+            {/* Glowing gradient frame around the image */}
+            <motion.div
+              style={{ rotateY: visualRotateY, rotateX: visualRotateX, perspective: 1000 }}
+              className="hero-visual relative rounded-[2rem] bg-gradient-to-br from-accent/40 via-white/10 to-transparent p-[2px] shadow-[0_0_60px_-15px_var(--accent)]"
             >
-              <Image
-                src="/images/hero3.jpg"
-                alt="Training session"
-                width={500}
-                height={400}
-                className="w-full object-cover aspect-[4/3] hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[calc(2rem-2px)] border border-white/10 bg-neutral-900">
+                <Image
+                  src="/images/power.png"
+                  alt="Athlete mid strength-training session"
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 40vw, 100vw"
+                  className="object-cover transition-transform duration-700 hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/20" />
+
+                {/* Viewfinder corner brackets — small, quiet, reinforce the
+                    "precision" idea instead of decorating for its own sake */}
+                {[
+                  "left-4 top-4 border-l border-t",
+                  "right-4 top-4 border-r border-t",
+                  "left-4 bottom-4 border-l border-b",
+                  "right-4 bottom-4 border-r border-b",
+                ].map((pos) => (
+                  <span
+                    key={pos}
+                    className={`absolute size-6 border-accent/60 ${pos}`}
+                  />
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Floating chip — top-left, overlapping the frame */}
+            <motion.div
+              style={{ x: chipParallaxX, y: chipParallaxY }}
+              className="hero-chip hero-chip-top glass-card absolute -left-8 top-10 z-20 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/70 p-4 shadow-2xl backdrop-blur-md"
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
+                <Users className="size-5" />
+              </span>
+              <div>
+                <p className="font-display text-xl font-black text-white">500+</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
+                  Athletes trained
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Floating chip — bottom-right, overlapping the frame */}
+            <motion.div
+              style={{ x: useTransform(chipParallaxX, (v) => -v), y: useTransform(chipParallaxY, (v) => -v) }}
+              className="hero-chip hero-chip-bottom absolute -bottom-6 right-6 z-20 max-w-[13rem] rounded-2xl border border-white/10 bg-black/70 p-4 shadow-2xl backdrop-blur-md"
+            >
+              <p className="text-xs leading-relaxed text-white/70">
+                With expert coaching and personalized guidance, you&rsquo;ll
+                learn the right techniques to progress safely and
+                effectively.
+              </p>
             </motion.div>
           </div>
         </div>
       </Container>
 
-      {/* Scroll indicator with opacity mapped to scroll offset */}
-      <motion.div 
+      <motion.div
         style={{ opacity: scrollIndicatorOpacity }}
-        className="hero-scroll-indicator absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 cursor-pointer pointer-events-none"
+        className="hero-scroll-indicator absolute bottom-20 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 cursor-pointer pointer-events-none"
       >
         <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">
           Scroll
         </span>
         <ChevronDown className="size-5 text-accent" />
       </motion.div>
+
+      {/* Kinetic marquee — the one loud element, everything else stays quiet
+          around it */}
+      <div className="absolute bottom-3 left-0 z-10 w-full overflow-hidden border-t border-white/10 py-1.5">
+        <div className="hero-marquee flex w-max items-center gap-8 whitespace-nowrap">
+          {[...marqueeWords, ...marqueeWords, ...marqueeWords].map((word, i) => (
+            <span
+              key={i}
+              className="flex items-center gap-8 text-xs font-bold uppercase tracking-[0.3em] text-white/40"
+            >
+              {word}
+              <span className="size-1 rounded-full bg-accent" />
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="hero-bottom-bar absolute bottom-0 left-0 h-3 w-full bg-accent" />
+
+      <style jsx global>{`
+        .hero-marquee {
+          animation: hero-marquee-scroll 22s linear infinite;
+        }
+        @keyframes hero-marquee-scroll {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-33.333%);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-marquee,
+          .hero-seal {
+            animation: none;
+          }
+        }
+      `}</style>
     </section>
   );
 }

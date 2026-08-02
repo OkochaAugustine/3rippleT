@@ -1,51 +1,187 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { motion, useMotionValue, useSpring, useTransform, useScroll } from "framer-motion";
-import { ArrowUpRight, ChevronDown, Flame, Users } from "lucide-react";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useScroll,
+  animate,
+} from "framer-motion";
+import {
+  ArrowUpRight,
+  ChevronDown,
+  Flame,
+  Star,
+  Dumbbell,
+  Heart,
+  User,
+  TrendingUp,
+} from "lucide-react";
 
 import { Container } from "@/components/ui/container";
 
-// Green clauses are the "why", the white clause is the "what" — two-tone
-// treatment, revealed word by word on load.
-const headlineWords = [
-  { text: "TRAIN", accent: true },
-  { text: "HARD.", accent: true },
-  { text: "LIVE", accent: true },
-  { text: "STRONG.", accent: true },
-  { text: "UNLEASH", accent: false },
-  { text: "YOUR", accent: false },
-  { text: "POWER.", accent: false },
+const PHRASES = [
+  "Train hard.",
+  "Live Strong.",
+  "Unleash your power.",
+  "Become Unstoppable.",
+  "Push Beyond Limits.",
+  "Build Your Best Body.",
 ];
 
-const marqueeWords = ["STRENGTH", "CONDITIONING", "MOBILITY", "RECOVERY", "PRECISION"];
+// Deterministic pseudo-scatter (golden-angle spread) instead of Math.random —
+// looks organic but renders identically on server and client, so there's no
+// hydration mismatch on the particle positions.
+const PARTICLE_COUNT = 20;
+const particles = Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
+  id: i,
+  left: `${(i * 137.5) % 100}%`,
+  size: 2 + (i % 3),
+  duration: 9 + (i % 5) * 1.6,
+  delay: (i % 7) * 0.6,
+}));
 
-// Circular seal copy — rendered on an SVG textPath so it can spin forever
-// without ever looking stretched or blurry.
-const SEAL_TEXT = "CERTIFIED COACHING • REAL RESULTS • ";
+const STATS = [
+  { value: 5000, suffix: "+", label: "Members" },
+  { value: 40, suffix: "+", label: "Classes Weekly" },
+  { value: 18, suffix: "", label: "Expert Coaches" },
+  { value: 97, suffix: "%", label: "Success Rate" },
+];
+
+function useTypewriter(phrases: string[], typingSpeed = 75, deletingSpeed = 40, pauseMs = 1600) {
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = phrases[index];
+
+    if (!deleting && subIndex === current.length) {
+      const t = setTimeout(() => setDeleting(true), pauseMs);
+      return () => clearTimeout(t);
+    }
+
+    if (deleting && subIndex === 0) {
+      const t = setTimeout(() => {
+        setDeleting(false);
+        setIndex((prev) => (prev + 1) % phrases.length);
+      }, 0);
+      return () => clearTimeout(t);
+    }
+
+    const t = setTimeout(
+      () => setSubIndex((prev) => prev + (deleting ? -1 : 1)),
+      deleting ? deletingSpeed : typingSpeed
+    );
+    return () => clearTimeout(t);
+  }, [subIndex, deleting, index, phrases, typingSpeed, deletingSpeed, pauseMs]);
+
+  return phrases[index].slice(0, subIndex);
+}
+
+function StatCounter({ value, suffix, label }: { value: number; suffix: string; label: string }) {
+  const [display, setDisplay] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    if (!ref.current || started) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStarted(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) return;
+    const controls = animate(0, value, {
+      duration: 1.6,
+      ease: "easeOut",
+      onUpdate: (v) => setDisplay(Math.round(v)),
+    });
+    return () => controls.stop();
+  }, [started, value]);
+
+  return (
+    <div ref={ref} className="flex flex-col items-center text-center">
+      <span className="font-display text-3xl font-black text-white sm:text-4xl">
+        {display}
+        <span className="text-accent">{suffix}</span>
+      </span>
+      <span className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function MiniStat({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 backdrop-blur-md">
+      <span className="text-accent">{icon}</span>
+      <div>
+        <p className="text-sm font-bold text-white">{value}</p>
+        <p className="text-[10px] uppercase tracking-wide text-white/40">{label}</p>
+      </div>
+    </div>
+  );
+}
+
+function GlassCard({
+  children,
+  position,
+  floatDuration,
+  floatDelay,
+  delay,
+}: {
+  children: React.ReactNode;
+  position: string;
+  floatDuration: number;
+  floatDelay: number;
+  delay: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.85, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ delay, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className={`absolute ${position} z-20 w-44 rounded-2xl border border-white/10 bg-black/60 p-4 shadow-2xl backdrop-blur-xl`}
+    >
+      <motion.div
+        animate={{ y: [0, -10, 0] }}
+        transition={{ duration: floatDuration, delay: floatDelay, repeat: Infinity, ease: "easeInOut" }}
+      >
+        {children}
+      </motion.div>
+    </motion.div>
+  );
+}
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const typed = useTypewriter(PHRASES);
 
   const { scrollY } = useScroll();
   const scrollIndicatorOpacity = useTransform(scrollY, [0, 100], [1, 0]);
 
-  // Mouse-driven values power the parallax text, the background spotlight,
-  // and a subtle 3D tilt on the side visual.
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const springX = useSpring(mouseX, { stiffness: 60, damping: 20 });
   const springY = useSpring(mouseY, { stiffness: 60, damping: 20 });
 
-  const textParallaxX = useTransform(springX, [-0.5, 0.5], [-8, 8]);
-  const textParallaxY = useTransform(springY, [-0.5, 0.5], [-5, 5]);
   const orbParallaxX = useTransform(springX, [-0.5, 0.5], [-25, 25]);
   const orbParallaxY = useTransform(springY, [-0.5, 0.5], [-20, 20]);
+  const orbParallaxXInverse = useTransform(orbParallaxX, (v) => -v);
 
   const spotlightX = useTransform(springX, [-0.5, 0.5], ["20%", "80%"]);
   const spotlightY = useTransform(springY, [-0.5, 0.5], ["20%", "80%"]);
@@ -54,75 +190,8 @@ export function Hero() {
     ([x, y]) => `radial-gradient(600px circle at ${x} ${y}, var(--accent) 0%, transparent 70%)`
   );
 
-  // Visual card tilts opposite to the mouse-driven text for a light
-  // parallax-depth effect between the two columns.
-  const visualRotateY = useTransform(springX, [-0.5, 0.5], [8, -8]);
-  const visualRotateX = useTransform(springY, [-0.5, 0.5], [-6, 6]);
-  const chipParallaxX = useTransform(springX, [-0.5, 0.5], [10, -10]);
-  const chipParallaxY = useTransform(springY, [-0.5, 0.5], [8, -8]);
-
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-
-      if (headlineRef.current) {
-        const words = headlineRef.current.querySelectorAll(".hero-word");
-        tl.fromTo(
-          words,
-          { y: "110%", opacity: 0, rotate: 3 },
-          { y: "0%", opacity: 1, rotate: 0, stagger: 0.07, duration: 1.1, transformOrigin: "0% 50%" }
-        );
-      }
-
-      tl.fromTo(".hero-badge", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, "-=0.9");
-      tl.fromTo(".hero-subtitle", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, "-=0.7");
-      tl.fromTo(".hero-cta-group", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, "-=0.6");
-      tl.fromTo(".hero-grid", { opacity: 0 }, { opacity: 1, duration: 1.4 }, 0);
-      tl.fromTo(
-        ".hero-visual",
-        { scale: 0.9, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 1.1 },
-        "-=0.8"
-      );
-      tl.fromTo(
-        ".hero-chip",
-        { y: 24, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.15, duration: 0.8 },
-        "-=0.6"
-      );
-      tl.fromTo(
-        ".hero-bottom-bar",
-        { scaleX: 0 },
-        { scaleX: 1, duration: 1.1, transformOrigin: "0% 50%" },
-        "-=0.4"
-      );
-
-      gsap.to(".hero-scroll-indicator", {
-        y: 6,
-        repeat: -1,
-        yoyo: true,
-        duration: 1.5,
-        ease: "sine.inOut",
-      });
-
-      // Slow, constant spin for the seal badge — independent of the intro
-      // timeline so it never stops.
-      gsap.to(".hero-seal", {
-        rotate: 360,
-        duration: 18,
-        repeat: -1,
-        ease: "linear",
-      });
-
-      // Gentle vertical drift for the floating chips.
-      gsap.to(".hero-chip-top", { y: -10, duration: 3.4, repeat: -1, yoyo: true, ease: "sine.inOut" });
-      gsap.to(".hero-chip-bottom", { y: 10, duration: 3.8, repeat: -1, yoyo: true, ease: "sine.inOut" });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
+  const clusterRotateY = useTransform(springX, [-0.5, 0.5], [6, -6]);
+  const clusterRotateX = useTransform(springY, [-0.5, 0.5], [-4, 4]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = sectionRef.current?.getBoundingClientRect();
@@ -138,215 +207,278 @@ export function Hero() {
       className="relative flex min-h-dvh items-center overflow-hidden bg-black"
       onMouseMove={handleMouseMove}
     >
-      {/* Fine structural grid — reads as a training-room floor plan rather
-          than decoration */}
+      {/* Structural grid */}
       <div
-        className="hero-grid pointer-events-none absolute inset-0 opacity-0"
+        className="pointer-events-none absolute inset-0 opacity-[0.06]"
         style={{
           backgroundImage:
-            "linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
+            "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
         }}
+        aria-hidden="true"
+      />
+
+      {/* Noise texture */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+        }}
+        aria-hidden="true"
       />
 
       {/* Cursor-tracked spotlight */}
       <motion.div
-        aria-hidden
+        aria-hidden="true"
         style={{ background: spotlightBackground }}
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        className="pointer-events-none absolute inset-0 opacity-[0.08]"
       />
 
-      {/* Ambient accent orbs */}
+      {/* Ambient glowing orbs */}
       <motion.div
         style={{ x: orbParallaxX, y: orbParallaxY }}
         className="pointer-events-none absolute -left-32 top-1/4 size-96 rounded-full bg-accent/15 blur-3xl"
+        aria-hidden="true"
       />
       <motion.div
-        style={{ x: useTransform(orbParallaxX, (v) => -v) }}
+        style={{ x: orbParallaxXInverse }}
         className="pointer-events-none absolute -right-24 bottom-1/4 size-80 rounded-full bg-accent/10 blur-3xl"
+        aria-hidden="true"
       />
 
-      {/* Vignette to keep the edges quiet under the grid + spotlight */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,black_100%)]" />
+      {/* Drifting particles */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        {particles.map((p) => (
+          <motion.span
+            key={p.id}
+            className="absolute rounded-full bg-accent/50"
+            style={{ left: p.left, bottom: "-10px", width: p.size, height: p.size }}
+            animate={{ y: ["0vh", "-100vh"], opacity: [0, 0.8, 0] }}
+            transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: "linear" }}
+          />
+        ))}
+      </div>
+
+      {/* Vignette */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,black_100%)]"
+        aria-hidden="true"
+      />
 
       <Container className="relative z-10 py-8 sm:py-12 md:py-16 lg:py-20">
-        <div className="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-8">
-          {/* Left — copy */}
+        <div className="grid gap-14 lg:grid-cols-12 lg:items-center lg:gap-8">
+          {/* Left column — copy */}
           <div className="lg:col-span-7">
-            <div className="hero-badge inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[10px] sm:text-xs md:text-sm font-semibold text-white/90 backdrop-blur-md">
-              <span className="size-1.5 sm:size-2 animate-pulse rounded-full bg-accent shadow-[0_0_12px_var(--accent)]" />
-              Premium coaching. Measurable momentum.
-            </div>
-
-            <motion.h1
-              ref={headlineRef}
-              style={{ x: textParallaxX, y: textParallaxY }}
-              className="mt-4 sm:mt-6 font-display text-[clamp(2rem,6vw,4.75rem)] font-black uppercase leading-[1.05] tracking-tight text-white"
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold text-white/90 backdrop-blur-md sm:text-sm"
             >
-              {headlineWords.map((word, i) => (
-                <span key={i} className="inline-block overflow-hidden mr-[0.22em] pb-1.5">
-                  <span
-                    className={`hero-word inline-block origin-left ${
-                      word.accent ? "text-accent" : "text-white"
-                    }`}
-                  >
-                    {word.text}
-                  </span>
-                </span>
-              ))}
-            </motion.h1>
+              <motion.span
+                animate={{ scale: [1, 1.3, 1] }}
+                transition={{ duration: 1.6, repeat: Infinity }}
+                className="size-2 rounded-full bg-accent shadow-[0_0_12px_var(--accent)]"
+              />
+              🔥 #1 Premium Fitness Experience
+            </motion.div>
 
-            <p className="hero-subtitle mt-4 sm:mt-6 max-w-lg text-sm sm:text-base md:text-lg leading-relaxed text-white/75">
+            <h1 className="mt-6 min-h-[2.2em] font-display text-[clamp(2rem,6vw,4.5rem)] font-black uppercase leading-[1.05] tracking-tight text-white">
+              {typed}
+              <motion.span
+                animate={{ opacity: [1, 0] }}
+                transition={{ duration: 0.8, repeat: Infinity, repeatType: "reverse" }}
+                className="ml-1 inline-block h-[0.9em] w-[3px] translate-y-1 bg-accent align-middle"
+                aria-hidden="true"
+              />
+            </h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="mt-6 max-w-lg text-sm leading-relaxed text-white/75 sm:text-base md:text-lg"
+            >
               Modern fitness programs and expert coaching designed to help you
               transform your body, elevate your mindset, and achieve lasting
               results.
-            </p>
+            </motion.p>
 
-            <div className="hero-cta-group mt-6 sm:mt-8 flex items-center gap-4">
-              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45, duration: 0.6 }}
+              className="mt-8 flex flex-wrap items-center gap-4"
+            >
+              <motion.div whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.97 }}>
                 <Link
                   href="#contact"
-                  className="group flex items-center gap-3 rounded-full bg-accent py-2 pl-6 pr-2 font-bold text-black shadow-glow transition-shadow hover:shadow-[0_0_28px_var(--accent)]"
+                  className="group flex items-center gap-3 rounded-full bg-accent py-3 pl-6 pr-2.5 font-bold text-black shadow-[0_0_30px_-8px_var(--accent)] transition-shadow hover:shadow-[0_0_40px_-6px_var(--accent)]"
                 >
-                  Join Now
+                  Start Your Journey
                   <span className="flex size-9 items-center justify-center rounded-full bg-black text-accent transition-transform duration-300 group-hover:rotate-45">
                     <ArrowUpRight className="size-4" />
                   </span>
                 </Link>
               </motion.div>
+
+              <motion.div whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.97 }}>
+                <Link
+                  href="#contact"
+                  className="rounded-full border border-white/20 bg-white/[0.04] px-6 py-3 font-bold text-white backdrop-blur-md transition-colors hover:border-accent/50 hover:text-accent"
+                >
+                  Book a Free Trial
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            {/* Social proof */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              className="mt-8 flex items-center gap-3"
+            >
+              <div className="flex" aria-hidden="true">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="size-4 fill-accent text-accent" />
+                ))}
+              </div>
+              <p className="text-sm text-white/60">
+                <span className="font-semibold text-white">Rated 4.9/5</span> by 5,000+ happy
+                members
+              </p>
+            </motion.div>
+
+            {/* Mobile-only compact stat chips — the floating cluster is desktop-only */}
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:hidden">
+              <MiniStat icon={<Flame className="size-4" />} value="680 kcal" label="Calories" />
+              <MiniStat icon={<Heart className="size-4" />} value="142 BPM" label="Heart Rate" />
+              <MiniStat icon={<Dumbbell className="size-4" />} value="95%" label="Strength" />
             </div>
           </div>
 
-          {/* Right — framed visual */}
+          {/* Right column — floating glass cards */}
           <div className="relative hidden lg:col-span-5 lg:block">
-            {/* Rotating certification seal, clipped to the top-right of the frame */}
-            <div className="hero-seal-wrap absolute -right-6 -top-6 z-30 size-24">
-              <svg viewBox="0 0 100 100" className="hero-seal size-24">
-                <defs>
-                  <path id="seal-circle" d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" />
-                </defs>
-                <circle cx="50" cy="50" r="38" fill="black" stroke="var(--accent)" strokeWidth="1" opacity="0.5" />
-                <text fill="var(--accent)" fontSize="7.2" fontWeight="700" letterSpacing="1">
-                  <textPath href="#seal-circle" startOffset="0%">
-                    {SEAL_TEXT}
-                  </textPath>
-                </text>
-              </svg>
-              <span className="absolute inset-0 m-auto flex size-9 items-center justify-center rounded-full bg-accent text-black">
-                <Flame className="size-4" />
-              </span>
-            </div>
-
-            {/* Glowing gradient frame around the image */}
             <motion.div
-              style={{ rotateY: visualRotateY, rotateX: visualRotateX, perspective: 1000 }}
-              className="hero-visual relative rounded-[2rem] bg-gradient-to-br from-accent/40 via-white/10 to-transparent p-[2px] shadow-[0_0_60px_-15px_var(--accent)]"
+              style={{ rotateY: clusterRotateY, rotateX: clusterRotateX, perspective: 1200 }}
+              className="relative h-[34rem]"
             >
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[calc(2rem-2px)] border border-white/10 bg-neutral-900">
-                <Image
-                  src="/images/power.png"
-                  alt="Athlete mid strength-training session"
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 40vw, 100vw"
-                  className="object-cover transition-transform duration-700 hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/20" />
+              <GlassCard position="left-6 top-2" floatDuration={5.5} floatDelay={0} delay={0.5}>
+                <div className="flex items-center gap-1" aria-hidden="true">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="size-3.5 fill-accent text-accent" />
+                  ))}
+                </div>
+                <p className="mt-2 font-display text-2xl font-black text-white">4.9 Rating</p>
+                <p className="text-xs text-white/50">5,000+ Members</p>
+              </GlassCard>
 
-                {/* Viewfinder corner brackets — small, quiet, reinforce the
-                    "precision" idea instead of decorating for its own sake */}
-                {[
-                  "left-4 top-4 border-l border-t",
-                  "right-4 top-4 border-r border-t",
-                  "left-4 bottom-4 border-l border-b",
-                  "right-4 bottom-4 border-r border-b",
-                ].map((pos) => (
-                  <span
-                    key={pos}
-                    className={`absolute size-6 border-accent/60 ${pos}`}
+              <GlassCard position="right-0 top-28" floatDuration={6.5} floatDelay={0.6} delay={0.65}>
+                <div className="flex items-center gap-2 text-accent">
+                  <Dumbbell className="size-4" />
+                  <span className="text-xs font-semibold uppercase tracking-wide text-white/50">
+                    Strength
+                  </span>
+                </div>
+                <p className="mt-2 font-display text-2xl font-black text-white">95%</p>
+                <div className="mt-2 h-1.5 w-28 overflow-hidden rounded-full bg-white/10">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: "95%" }}
+                    transition={{ duration: 1.2, delay: 1 }}
+                    className="h-full rounded-full bg-accent"
                   />
-                ))}
-              </div>
-            </motion.div>
+                </div>
+              </GlassCard>
 
-            {/* Floating chip — top-left, overlapping the frame */}
-            <motion.div
-              style={{ x: chipParallaxX, y: chipParallaxY }}
-              className="hero-chip hero-chip-top glass-card absolute -left-8 top-10 z-20 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/70 p-4 shadow-2xl backdrop-blur-md"
-            >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
-                <Users className="size-5" />
-              </span>
-              <div>
-                <p className="font-display text-xl font-black text-white">500+</p>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
-                  Athletes trained
-                </p>
-              </div>
-            </motion.div>
+              <GlassCard position="left-2 top-[17rem]" floatDuration={6} floatDelay={1.1} delay={0.8}>
+                <div className="flex items-center gap-2 text-accent">
+                  <Flame className="size-4" />
+                  <span className="text-xs font-semibold uppercase tracking-wide text-white/50">
+                    Calories
+                  </span>
+                </div>
+                <p className="mt-2 font-display text-2xl font-black text-white">680 kcal</p>
+              </GlassCard>
 
-            {/* Floating chip — bottom-right, overlapping the frame */}
-            <motion.div
-              style={{ x: useTransform(chipParallaxX, (v) => -v), y: useTransform(chipParallaxY, (v) => -v) }}
-              className="hero-chip hero-chip-bottom absolute -bottom-6 right-6 z-20 max-w-[13rem] rounded-2xl border border-white/10 bg-black/70 p-4 shadow-2xl backdrop-blur-md"
-            >
-              <p className="text-xs leading-relaxed text-white/70">
-                With expert coaching and personalized guidance, you&rsquo;ll
-                learn the right techniques to progress safely and
-                effectively.
-              </p>
+              <GlassCard position="right-4 top-[21rem]" floatDuration={5} floatDelay={0.3} delay={0.95}>
+                <div className="flex items-center gap-2">
+                  <motion.span
+                    animate={{ scale: [1, 1.15, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="text-red-400"
+                  >
+                    <Heart className="size-4 fill-current" />
+                  </motion.span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-white/50">
+                    Heart Rate
+                  </span>
+                </div>
+                <p className="mt-2 font-display text-2xl font-black text-white">142 BPM</p>
+              </GlassCard>
+
+              <GlassCard position="left-10 bottom-16" floatDuration={7} floatDelay={0.9} delay={1.1}>
+                <div className="flex items-center gap-3">
+                  <span className="flex size-9 items-center justify-center rounded-full bg-accent/15 text-accent">
+                    <User className="size-4" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-bold text-white">Personal Coach</p>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-accent">
+                      <span className="size-1.5 rounded-full bg-accent" /> Online
+                    </span>
+                  </div>
+                </div>
+              </GlassCard>
+
+              <GlassCard position="right-2 bottom-0" floatDuration={6.2} floatDelay={1.4} delay={1.25}>
+                <div className="flex items-center gap-2 text-accent">
+                  <TrendingUp className="size-4" />
+                  <span className="text-xs font-semibold uppercase tracking-wide text-white/50">
+                    Transformation
+                  </span>
+                </div>
+                <p className="mt-2 font-display text-2xl font-black text-white">+12kg Muscle</p>
+                <p className="text-xs text-white/50">In 90 Days</p>
+              </GlassCard>
+
+              {/* Center glow anchoring the cluster */}
+              <div
+                className="pointer-events-none absolute left-1/2 top-1/2 size-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-3xl"
+                aria-hidden="true"
+              />
             </motion.div>
           </div>
         </div>
+
+        {/* Bottom animated stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mt-16 grid grid-cols-2 gap-8 border-t border-white/10 pt-10 sm:grid-cols-4 lg:mt-24"
+        >
+          {STATS.map((stat) => (
+            <StatCounter key={stat.label} value={stat.value} suffix={stat.suffix} label={stat.label} />
+          ))}
+        </motion.div>
       </Container>
 
+      {/* Scroll indicator */}
       <motion.div
         style={{ opacity: scrollIndicatorOpacity }}
-        className="hero-scroll-indicator absolute bottom-20 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 cursor-pointer pointer-events-none"
+        animate={{ y: [0, 8, 0] }}
+        transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+        className="pointer-events-none absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2"
       >
         <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">
           Scroll
         </span>
         <ChevronDown className="size-5 text-accent" />
       </motion.div>
-
-      {/* Kinetic marquee — the one loud element, everything else stays quiet
-          around it */}
-      <div className="absolute bottom-3 left-0 z-10 w-full overflow-hidden border-t border-white/10 py-1.5">
-        <div className="hero-marquee flex w-max items-center gap-8 whitespace-nowrap">
-          {[...marqueeWords, ...marqueeWords, ...marqueeWords].map((word, i) => (
-            <span
-              key={i}
-              className="flex items-center gap-8 text-xs font-bold uppercase tracking-[0.3em] text-white/40"
-            >
-              {word}
-              <span className="size-1 rounded-full bg-accent" />
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="hero-bottom-bar absolute bottom-0 left-0 h-3 w-full bg-accent" />
-
-      <style jsx global>{`
-        .hero-marquee {
-          animation: hero-marquee-scroll 22s linear infinite;
-        }
-        @keyframes hero-marquee-scroll {
-          from {
-            transform: translateX(0);
-          }
-          to {
-            transform: translateX(-33.333%);
-          }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .hero-marquee,
-          .hero-seal {
-            animation: none;
-          }
-        }
-      `}</style>
     </section>
   );
 }

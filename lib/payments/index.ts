@@ -77,14 +77,11 @@ export async function initFlutterwavePayment(params: FlutterwaveInitParams): Pro
 }
 
 export function calculateMembershipExpiry(
-  planId: keyof typeof PAYMENT_CONFIG.plans,
+  planId: string,
   fromDate = new Date(),
 ): Date {
   const expiry = new Date(fromDate);
-  if (planId === "daily") {
-    expiry.setDate(expiry.getDate() + 1);
-  } else {
-    expiry.setMonth(expiry.getMonth() + 1);
-  }
+  // All plans are monthly except daily, but since our categories are all monthly, default to 1 month
+  expiry.setMonth(expiry.getMonth() + 1);
   return expiry;
 }

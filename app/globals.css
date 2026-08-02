@@ -192,17 +192,17 @@ select {
 }
 
 .glass-card {
-  background: rgb(255 255 255 / 0.7);
-  border: 1px solid rgb(0 0 0 / 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 4px 24px rgb(0 0 0 / 0.04), 0 1px 3px rgb(0 0 0 / 0.02);
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.3), 0 1px 8px rgba(0, 0, 0, 0.15);
 }
 
 .dark .glass-card {
-  background: rgb(255 255 255 / 0.03);
-  border-color: rgb(255 255 255 / 0.08);
-  box-shadow: 0 4px 32px rgb(0 0 0 / 0.3), 0 1px 8px rgb(0 0 0 / 0.15);
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.3), 0 1px 8px rgba(0, 0, 0, 0.15);
 }
 
 .nav-link-glow {

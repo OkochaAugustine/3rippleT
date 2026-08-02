@@ -83,3 +83,22 @@ export interface TrainingVideo {
   // actual mp4 file
   video?: string;
 }
+
+export interface MembershipPackage {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  features: string[];
+  popular?: boolean;
+  classes: number;
+}
+
+export interface FitnessCategory {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  startingPrice: number;
+  packages: MembershipPackage[];
+}

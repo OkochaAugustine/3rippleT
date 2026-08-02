@@ -55,10 +55,9 @@ export const programsMegaMenu: MegaMenuItem[] = [
 export const siteNavigation: NavItem[] = [
   { label: "Home", href: "/", icon: Home },
   {
-    label: "Programs",
-    href: "/programs",
-    icon: Dumbbell,
-    megaMenu: programsMegaMenu,
+    label: "Delta State Fitness Carnival",
+    href: "/events/delta-state-fitness-carnival",
+    icon: CalendarDays,
   },
   { label: "About", href: "/about", icon: Info },
   { label: "Pricing", href: "/pricing", icon: Tags },

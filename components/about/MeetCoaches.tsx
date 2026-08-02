@@ -70,7 +70,7 @@ export function MeetCoaches() {
               transition={{ delay: index * 0.1, duration: 0.6 }}
               className="group"
             >
-              <div className="relative overflow-hidden rounded-lg border border-border bg-card">
+              <div className="relative overflow-hidden rounded-lg border border-white/10 bg-black/50 backdrop-blur-md">
                 <Image
                   src={coach.image}
                   alt={coach.name}
@@ -78,18 +78,18 @@ export function MeetCoaches() {
                   height={400}
                   className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/90 to-transparent p-4">
-                  <h3 className="font-bold">{coach.name}</h3>
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-4">
+                  <h3 className="font-bold text-white">{coach.name}</h3>
                   <p className="text-sm text-accent">{coach.role}</p>
                 </div>
               </div>
               <div className="mt-4">
-                <p className="text-sm text-muted-foreground">{coach.bio}</p>
+                <p className="text-sm text-white/70">{coach.bio}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {coach.specialties.map((specialty) => (
                     <span
                       key={specialty}
-                      className="rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground"
+                      className="rounded-full bg-white/10 px-3 py-1 text-xs text-white"
                     >
                       {specialty}
                     </span>

@@ -1,14 +1,35 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { CreditCard, Calendar, Check } from "lucide-react";
+import { CreditCard, Calendar, ArrowRight } from "lucide-react";
 
 import { Container } from "@/components/ui/container";
 import { Heading } from "@/components/ui/heading";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function MembershipPage() {
+  const { user } = useAuth();
+
+  // Check if membership is active
+  const isMembershipActive = user?.membership && user?.membershipExpiry && new Date(user.membershipExpiry) > new Date();
+  const membershipStatus = isMembershipActive ? "Active" : "Inactive";
+
+  if (!user) {
+    return (
+      <Section className="bg-background min-h-screen">
+        <Container>
+          <div className="animate-pulse space-y-6">
+            <div className="h-8 w-64 bg-muted rounded" />
+            <div className="h-48 bg-muted rounded-lg" />
+          </div>
+        </Container>
+      </Section>
+    );
+  }
+
   return (
     <Section className="bg-background min-h-screen">
       <Container>
@@ -31,111 +52,128 @@ export default function MembershipPage() {
           transition={{ delay: 0.2, duration: 0.6 }}
           className="mt-8 space-y-6"
         >
+          {/* Membership Info */}
           <div className="rounded-lg border border-border bg-card p-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="text-2xl font-bold">Premium Plan</h3>
-                <p className="mt-1 text-muted-foreground">$149/month</p>
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold">
+                  {user?.membershipPlan || "No Membership"}
+                </h3>
+                <p className="mt-1 text-muted-foreground">
+                  {isMembershipActive ? (
+                    "Your membership is currently active"
+                  ) : (
+                    "You don't have an active membership yet"
+                  )}
+                </p>
                 <div className="mt-4 flex items-center gap-2">
-                  <span className="rounded-full bg-green-500/20 text-green-500 px-3 py-1 text-sm font-semibold">
-                    Active
+                  <span
+                    className={`rounded-full px-3 py-1 text-sm font-semibold ${
+                      isMembershipActive
+                        ? "bg-green-500/20 text-green-500"
+                        : "bg-gray-500/20 text-gray-500"
+                    }`}
+                  >
+                    {membershipStatus}
                   </span>
-                  <span className="text-sm text-muted-foreground">Since January 2024</span>
+                  {user?.membershipExpiry && (
+                    <span className="text-sm text-muted-foreground">
+                      Expires {new Date(user.membershipExpiry).toLocaleDateString()}
+                    </span>
+                  )}
                 </div>
               </div>
-              <Button>Upgrade Plan</Button>
-            </div>
 
-            <div className="mt-6">
-              <h4 className="font-semibold mb-3">Included Features</h4>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-accent" />
-                  <span>Unlimited group classes</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-accent" />
-                  <span>Open gym access</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-accent" />
-                  <span>Personal training (2x/month)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-accent" />
-                  <span>Priority booking</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-accent" />
-                  <span>Custom programming</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-accent" />
-                  <span>Recovery sessions</span>
-                </li>
-              </ul>
+              {!isMembershipActive ? (
+                <Link href="/membership">
+                  <Button className="gap-2">
+                    Purchase Membership
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/membership">
+                  <Button variant="outline" className="gap-2">
+                    Upgrade Plan
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
 
-          <div className="rounded-lg border border-border bg-card p-6">
-            <h3 className="text-lg font-bold mb-4">Billing Information</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <CreditCard className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-semibold">Visa ending in 4242</p>
-                    <p className="text-sm text-muted-foreground">Expires 12/2026</p>
+          {/* Billing & Payment History (if no active membership, show CTA) */}
+          {isMembershipActive ? (
+            <>
+              <div className="rounded-lg border border-border bg-card p-6">
+                <h3 className="text-lg font-bold mb-4">Billing Information</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-semibold">Credit Card (Paystack)</p>
+                        <p className="text-sm text-muted-foreground">Managed via Paystack</p>
+                      </div>
+                    </div>
                   </div>
+                  {user?.membershipExpiry && (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-semibold">Next billing date</p>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(user.membershipExpiry).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <Button variant="outline" size="sm">Update</Button>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-semibold">Next billing date</p>
-                    <p className="text-sm text-muted-foreground">August 1, 2026</p>
-                  </div>
+            </>
+          ) : (
+            <div className="rounded-2xl border border-border bg-card p-8">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">
+                    Ready to start your fitness journey?
+                  </h3>
+
+                  <p className="mt-3 max-w-2xl text-muted-foreground">
+                    Choose the membership package that fits your goals. Once payment
+                    is completed, your membership will be activated automatically,
+                    invoices generated, and you&apos;ll be able to reserve classes from
+                    your dashboard.
+                  </p>
                 </div>
-                <span className="font-semibold">$149.00</span>
+
+                <Link href="/membership">
+                  <Button size="lg" className="gap-2">
+                    View Membership Packages
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
               </div>
             </div>
-          </div>
+          )}
 
+          {/* Link to Invoices */}
           <div className="rounded-lg border border-border bg-card p-6">
-            <h3 className="text-lg font-bold mb-4">Payment History</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between py-3 border-b border-border">
-                <div>
-                  <p className="font-semibold">July 2026</p>
-                  <p className="text-sm text-muted-foreground">Premium Plan</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">$149.00</p>
-                  <p className="text-sm text-green-500">Paid</p>
-                </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold">Payment History & Invoices</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  View all your invoices and download receipts
+                </p>
               </div>
-              <div className="flex items-center justify-between py-3 border-b border-border">
-                <div>
-                  <p className="font-semibold">June 2026</p>
-                  <p className="text-sm text-muted-foreground">Premium Plan</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">$149.00</p>
-                  <p className="text-sm text-green-500">Paid</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-semibold">May 2026</p>
-                  <p className="text-sm text-muted-foreground">Premium Plan</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">$149.00</p>
-                  <p className="text-sm text-green-500">Paid</p>
-                </div>
-              </div>
+              <Link href="/dashboard/invoices">
+                <Button variant="outline" className="gap-2">
+                  View Invoices
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
         </motion.div>

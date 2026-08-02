@@ -56,6 +56,8 @@ export async function POST(req: Request) {
         email: user.email,
         phone: user.phone,
         membership: user.membership,
+        membershipPlan: user.membershipPlan,
+        membershipExpiry: user.membershipExpiry,
         role: user.role,
         isVerified: user.isVerified,
         verificationStatus: user.verificationStatus,

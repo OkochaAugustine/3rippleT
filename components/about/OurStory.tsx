@@ -1,64 +1,76 @@
 "use client";
 
-import Image from "next/image";
-
 import { motion } from "framer-motion";
-
 import { Container } from "@/components/ui/container";
-import { Heading } from "@/components/ui/heading";
 import { Section } from "@/components/ui/section";
 
 export function OurStory() {
   return (
-    <Section className="bg-background">
+    <Section className="bg-black py-24 md:py-32">
       <Container>
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+        <div className="max-w-4xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
           >
-            <Heading as="h2" size="lg">
-              Our <span className="text-accent">Story</span>
-            </Heading>
-            <div className="mt-6 space-y-4 text-muted-foreground">
-              <p>
-                3Ripple T Fitness was born from a simple belief: that everyone deserves access to world-class coaching and a community that genuinely cares about their success.
-              </p>
-              <p>
-                What started as a small training space has evolved into a premier fitness destination, but our core values remain unchanged. We believe in training with intent, moving with purpose, and supporting each other through every rep and every milestone.
-              </p>
-              <p>
-                Our name represents the three ripples of fitness: physical strength, mental resilience, and community connection. When you train with us, you&apos;re not just building a better body—you&apos;re creating momentum that touches every aspect of your life.
-              </p>
-              <p>
-                Today, we&apos;re proud to serve 500+ active members, offer 50+ weekly classes, and continue pushing the boundaries of what&apos;s possible in fitness coaching and community building.
-              </p>
-            </div>
+            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white mb-8">
+              Our Story
+            </h2>
           </motion.div>
 
+          <div className="space-y-8 text-lg md:text-xl text-white/80 leading-relaxed">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              It started with a simple idea: create a space where people could come together, push their limits, and support each other on their fitness journeys. What began as a small local fitness community in Asaba has grown into something far bigger than we ever imagined.
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              Over the last 10 years, we have witnessed incredible transformations. Not just in bodies, but in minds and spirits. We have seen strangers become training partners, training partners become friends, and friends become family. This is the heart of 3Ripple T Fitness.
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              Today, with over 200 active members, we are proud to be one of the leading fitness communities in Delta State. But we are not stopping here. We continue to grow, innovate, and inspire through our signature events like the Delta State Fitness Carnival, Tabata Fitness Events, and our ongoing Community Wellness Programs.
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              Our journey is far from over. Every day, we wake up with the same passion that started it all: helping people become healthier, stronger, more confident, and more disciplined through fitness. This is our story. And we invite you to be part of the next chapter.
+            </motion.p>
+          </div>
+
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="relative"
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="mt-12 p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm"
           >
-            <div className="relative overflow-hidden rounded-lg border border-border bg-card shadow-soft">
-              <Image
-                src="/images/placeholders/hero-bg.svg"
-                alt="3Ripple T Fitness facility"
-                width={600}
-                height={500}
-                className="w-full h-auto"
-                sizes="(min-width: 1024px) 45vw, 100vw"
-              />
-            </div>
-            <div className="absolute -bottom-6 -right-6 rounded-lg border border-border bg-card p-6 shadow-soft">
-              <p className="text-4xl font-black text-accent">12+</p>
-              <p className="text-sm text-muted-foreground">Years of Excellence</p>
-            </div>
+            <p className="text-sm font-semibold uppercase tracking-wider text-accent mb-2">
+              Location
+            </p>
+            <p className="text-white/90">
+              Behind La Diva Hotel, Okpanam Road, Asaba, Delta State, Nigeria
+            </p>
           </motion.div>
         </div>
       </Container>

@@ -13,9 +13,10 @@ const UserSchema = new Schema(
     phone: { type: String, default: "" },
     membership: { 
       type: String, 
-      enum: ["none", "daily", "monthly", "premium"], 
       default: "none" 
     },
+    membershipPlan: { type: String, default: "" },
+    membershipExpiry: { type: Date, default: null },
     role: { 
       type: String, 
       enum: ["MEMBER", "ADMIN", "COACH"], 
@@ -35,7 +36,7 @@ const UserSchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export const User = mongoose.models.User || mongoose.model("User", UserSchema);

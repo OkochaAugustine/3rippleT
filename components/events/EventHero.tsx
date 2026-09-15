@@ -12,7 +12,7 @@ import { useRef, useState, useEffect } from "react";
 import {
   Calendar,
   MapPin,
-  Clock3,
+  Clock,
   Trophy,
   ChevronLeft,
   ChevronRight,
@@ -135,7 +135,7 @@ export function EventHero() {
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
       
       {/* Subtle carnival effects */}
-      <CarnivalEffects className="absolute inset-0 opacity-30 pointer-events-none" />
+      <CarnivalEffects className="absolute inset-0 opacity-40 pointer-events-none" />
       {/* Glowing light streaks */}
       <motion.div
         animate={{
@@ -153,25 +153,6 @@ export function EventHero() {
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         className="absolute top-2/3 left-1/2 -translate-x-1/2 w-[600px] h-[1px] bg-gradient-to-r from-transparent via-orange-500/30 to-transparent blur-sm pointer-events-none"
       />
-      <motion.div
-        animate={{
-          x: [-20, 20, -20],
-          opacity: [0, 0.4, 0],
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[2px] bg-gradient-to-r from-transparent via-accent/30 to-transparent blur-sm pointer-events-none"
-      />
-      <motion.div
-        animate={{
-          x: [20, -20, 20],
-          opacity: [0, 0.3, 0],
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="absolute top-2/3 left-1/2 -translate-x-1/2 w-[600px] h-[1px] bg-gradient-to-r from-transparent via-orange-500/30 to-transparent blur-sm pointer-events-none"
-      />
-
-      {/* Subtle carnival effects */}
-      <CarnivalEffects className="absolute inset-0 opacity-50 pointer-events-none" />
 
       {/* Photo edge glows - animated */}
       <motion.div
@@ -190,13 +171,13 @@ export function EventHero() {
       <Container className="relative z-10 flex-1 flex flex-col justify-center py-2 sm:py-4 md:py-8 lg:py-14">
         <div className="mx-auto w-full max-w-7xl">
           <div className="grid items-center gap-2 lg:grid-cols-2 lg:gap-12">
-            {/* Mobile: Photo slider first */}
-            <div className="order-1 mb-2 lg:hidden">
+            {/* Mobile: Photo slider first - LARGE photography */}
+            <div className="order-1 mb-4 lg:hidden">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.2 }}
-                className="relative h-44 overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl sm:h-52 md:h-56"
+                className="relative h-[45vh] overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl sm:h-[50vh] md:h-[45vh]"
               >
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -224,7 +205,7 @@ export function EventHero() {
                         src={heroPhotos[currentPhotoIndex].src}
                         alt={heroPhotos[currentPhotoIndex].alt}
                         fill
-                        className="object-cover object-center"
+                        className="object-cover"
                         priority={currentPhotoIndex === 0}
                         sizes="100vw"
                       />
@@ -598,7 +579,7 @@ export function EventHero() {
                 whileHover={{ scale: 1.05 }}
                 className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-lg p-1.5 text-center"
               >
-                <Clock3 className="mx-auto mb-0.5 h-3 w-3 text-accent" />
+                <Clock className="mx-auto mb-0.5 h-3 w-3 text-accent" />
                 <p className="text-[8px] text-white/60 uppercase tracking-wider">Time</p>
                 <p className="text-[9px] font-semibold text-white">{details.time}</p>
               </motion.div>

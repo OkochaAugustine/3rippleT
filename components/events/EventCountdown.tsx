@@ -75,7 +75,7 @@ const TimeUnit = ({ value, label }: { value: number; label: string }) => (
       />
       
       {/* Main number container with depth */}
-      <div className="relative rounded-lg border border-white/15 bg-black/50 px-2 py-1.5 backdrop-blur-sm sm:px-3 sm:py-2 md:px-6 md:py-4">
+      <div className="relative rounded-lg border border-white/15 bg-black/50 px-1 py-1 backdrop-blur-sm sm:px-2 sm:py-1.5 md:px-4 md:py-3">
         {/* Inner glow */}
         <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-white/10 via-transparent to-black/30 pointer-events-none" />
         
@@ -92,7 +92,7 @@ const TimeUnit = ({ value, label }: { value: number; label: string }) => (
             ],
           }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="flex h-6 items-center justify-center overflow-hidden text-lg font-display font-black tracking-tight text-white tabular-nums sm:h-8 sm:text-2xl md:h-10 md:text-4xl lg:h-14 lg:text-6xl"
+          className="flex h-5 items-center justify-center overflow-hidden text-base font-display font-black tracking-tight text-white tabular-nums sm:h-6 sm:text-lg md:h-8 md:text-2xl lg:h-12 lg:text-5xl"
         >
           <AnimatedNumber value={value} />
         </motion.div>
@@ -113,10 +113,10 @@ const TimeUnit = ({ value, label }: { value: number; label: string }) => (
     <motion.span
       animate={{
         opacity: [0.6, 0.8, 0.6],
-        letterSpacing: ["0.3em", "0.35em", "0.3em"],
+        letterSpacing: ["0.15em", "0.2em", "0.15em"],
       }}
       transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-      className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.2em] text-white/60 sm:mt-2 sm:text-[10px] md:text-sm md:tracking-[0.3em]"
+      className="mt-1 text-[6px] font-semibold uppercase tracking-[0.15em] text-white/60 sm:mt-1.5 sm:text-[8px] md:text-[9px] md:tracking-[0.2em]"
     >
       {label}
     </motion.span>
@@ -167,7 +167,7 @@ export function EventCountdown({ className = "" }: CountdownProps) {
 
   return (
     <div className={className}>
-      <div className="mx-auto grid max-w-4xl grid-cols-2 gap-2 sm:gap-3 md:gap-6 lg:gap-12">
+      <div className="mx-auto grid max-w-4xl grid-cols-4 gap-1 sm:gap-2 md:gap-4 lg:gap-12">
         <TimeUnit value={timeLeft.days} label="DAYS" />
         <TimeUnit value={timeLeft.hours} label="HOURS" />
         <TimeUnit value={timeLeft.minutes} label="MINUTES" />

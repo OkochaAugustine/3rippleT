@@ -13,33 +13,23 @@ interface HeroSlide {
 const HERO_SLIDES: HeroSlide[] = [
   {
     id: "1",
-    src: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop",
-    alt: "CrossFit competition athletes",
+    src: "/images/canival2.jpg",
+    alt: "Delta State Fitness Carnival celebration",
   },
   {
     id: "2",
-    src: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop",
-    alt: "Gym workout training",
+    src: "/images/hero.jpg",
+    alt: "Fitness carnival athletes",
   },
   {
     id: "3",
-    src: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop",
-    alt: "Fitness festival crowd",
+    src: "/images/gallary1.jpg",
+    alt: "Carnival crowd energy",
   },
   {
     id: "4",
-    src: "https://images.unsplash.com/photo-1552674605-469523d5b5f4?q=80&w=2070&auto=format&fit=crop",
-    alt: "Outdoor workout group",
-  },
-  {
-    id: "5",
-    src: "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=2069&auto=format&fit=crop",
-    alt: "Functional fitness training",
-  },
-  {
-    id: "6",
-    src: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=2069&auto=format&fit=crop",
-    alt: "Running event marathon",
+    src: "/images/gallary3.jpg",
+    alt: "Fitness competition",
   },
 ];
 

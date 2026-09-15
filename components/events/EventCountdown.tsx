@@ -1,7 +1,7 @@
 "use client";
 
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { getEventDate } from "@/constants/event-config";
 
 interface CountdownProps {
@@ -14,31 +14,6 @@ interface TimeLeft {
   minutes: number;
   seconds: number;
 }
-
-const TimeBlock = ({ value, label }: { value: number; label: string }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="flex flex-col items-center"
-  >
-    <div className="relative">
-      <motion.div
-        key={value}
-        initial={{ scale: 0.8, opacity: 0.5 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className="min-w-[80px] md:min-w-[120px] rounded-2xl border border-white/20 bg-black/60 p-4 md:p-6 backdrop-blur-xl"
-      >
-        <span className="block text-4xl md:text-6xl font-black text-white tabular-nums">
-          {String(value).padStart(2, "0")}
-        </span>
-      </motion.div>
-      <div className="absolute -inset-1 rounded-2xl bg-accent/20 blur-xl" />
-    </div>
-    <span className="mt-3 text-xs md:text-sm font-bold uppercase tracking-widest text-white/60">
-      {label}
-    </span>
-  </motion.div>
-);
 
 const calculateTimeLeft = (): TimeLeft => {
   const eventDate = getEventDate();
@@ -57,13 +32,99 @@ const calculateTimeLeft = (): TimeLeft => {
   return { days, hours, minutes, seconds };
 };
 
+const AnimatedNumber = ({ value }: { value: number }) => (
+  <AnimatePresence mode="wait">
+    <motion.span
+      key={value}
+      initial={{ y: 30, opacity: 0, scale: 0.8, filter: "blur(4px)" }}
+      animate={{ y: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
+      exit={{ y: -30, opacity: 0, scale: 0.8, filter: "blur(4px)" }}
+      transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+      className="block"
+    >
+      {String(value).padStart(2, "0")}
+    </motion.span>
+  </AnimatePresence>
+);
+
+const TimeUnit = ({ value, label }: { value: number; label: string }) => (
+  <div className="flex flex-col items-center">
+    <motion.div
+      className="relative"
+      whileHover={{ scale: 1.05 }}
+      transition={{ duration: 0.2 }}
+    >
+      {/* Multi-layered glow effect */}
+      <motion.div
+        animate={{
+          boxShadow: [
+            "0 0 30px rgba(163, 230, 53, 0.15)",
+            "0 0 50px rgba(163, 230, 53, 0.25)",
+            "0 0 30px rgba(163, 230, 53, 0.15)",
+          ],
+        }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute inset-0 rounded-lg bg-accent/10 blur-2xl"
+      />
+      <motion.div
+        animate={{
+          opacity: [0.3, 0.5, 0.3],
+        }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute inset-0 rounded-lg bg-gradient-to-br from-accent/20 via-transparent to-orange-500/10 blur-xl"
+      />
+      
+      {/* Main number container with depth */}
+      <div className="relative rounded-lg border border-white/15 bg-black/50 px-2 py-1.5 backdrop-blur-sm sm:px-3 sm:py-2 md:px-6 md:py-4">
+        {/* Inner glow */}
+        <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-white/10 via-transparent to-black/30 pointer-events-none" />
+        
+        {/* Luminous edge */}
+        <div className="absolute inset-0 rounded-lg border border-accent/20 pointer-events-none" />
+        
+        {/* Number with luminous effect */}
+        <motion.div
+          animate={{
+            textShadow: [
+              "0 0 10px rgba(255, 255, 255, 0.3)",
+              "0 0 20px rgba(255, 255, 255, 0.5)",
+              "0 0 10px rgba(255, 255, 255, 0.3)",
+            ],
+          }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="flex h-6 items-center justify-center overflow-hidden text-lg font-display font-black tracking-tight text-white tabular-nums sm:h-8 sm:text-2xl md:h-10 md:text-4xl lg:h-14 lg:text-6xl"
+        >
+          <AnimatedNumber value={value} />
+        </motion.div>
+        
+        {/* Bottom accent line with glow */}
+        <motion.div
+          animate={{
+            opacity: [0.5, 0.8, 0.5],
+            scaleX: [0.8, 1, 0.8],
+          }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/70 to-transparent"
+        />
+      </div>
+    </motion.div>
+    
+    {/* Enhanced label */}
+    <motion.span
+      animate={{
+        opacity: [0.6, 0.8, 0.6],
+        letterSpacing: ["0.3em", "0.35em", "0.3em"],
+      }}
+      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.2em] text-white/60 sm:mt-2 sm:text-[10px] md:text-sm md:tracking-[0.3em]"
+    >
+      {label}
+    </motion.span>
+  </div>
+);
+
 export function EventCountdown({ className = "" }: CountdownProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => calculateTimeLeft());
-  const isEventHere =
-    timeLeft.days === 0 &&
-    timeLeft.hours === 0 &&
-    timeLeft.minutes === 0 &&
-    timeLeft.seconds === 0;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -73,30 +134,45 @@ export function EventCountdown({ className = "" }: CountdownProps) {
     return () => clearInterval(timer);
   }, []);
 
+  const isEventHere =
+    timeLeft.days === 0 &&
+    timeLeft.hours === 0 &&
+    timeLeft.minutes === 0 &&
+    timeLeft.seconds === 0;
+
   if (isEventHere) {
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         className={`text-center ${className}`}
       >
-        <motion.div
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 1, repeat: Infinity }}
-          className="text-4xl md:text-6xl font-black text-accent"
+        <motion.p
+          animate={{
+            scale: [1, 1.05, 1],
+            textShadow: [
+              "0 0 20px rgba(163, 230, 53, 0.5)",
+              "0 0 40px rgba(163, 230, 53, 0.8)",
+              "0 0 20px rgba(163, 230, 53, 0.5)",
+            ],
+          }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-accent tracking-tight"
         >
-          THE CARNIVAL IS HERE! 🎉🔥
-        </motion.div>
+          THE CARNIVAL IS HERE
+        </motion.p>
       </motion.div>
     );
   }
 
   return (
-    <div className={`flex flex-wrap justify-center gap-4 md:gap-8 ${className}`}>
-      <TimeBlock value={timeLeft.days} label="DAYS" />
-      <TimeBlock value={timeLeft.hours} label="HOURS" />
-      <TimeBlock value={timeLeft.minutes} label="MINUTES" />
-      <TimeBlock value={timeLeft.seconds} label="SECONDS" />
+    <div className={className}>
+      <div className="mx-auto grid max-w-4xl grid-cols-2 gap-2 sm:gap-3 md:gap-6 lg:gap-12">
+        <TimeUnit value={timeLeft.days} label="DAYS" />
+        <TimeUnit value={timeLeft.hours} label="HOURS" />
+        <TimeUnit value={timeLeft.minutes} label="MINUTES" />
+        <TimeUnit value={timeLeft.seconds} label="SECONDS" />
+      </div>
     </div>
   );
 }

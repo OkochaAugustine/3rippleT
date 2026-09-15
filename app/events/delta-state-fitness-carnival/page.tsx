@@ -1,5 +1,13 @@
 import { EventHero } from "@/components/events/EventHero";
-import { EventInfo } from "@/components/events/EventInfo";
+import { CarnivalVideo } from "@/components/events/CarnivalVideo";
+import { CarnivalIntro } from "@/components/events/CarnivalIntro";
+import { CarnivalEnergy } from "@/components/events/CarnivalEnergy";
+import { CarnivalCommunity } from "@/components/events/CarnivalCommunity";
+import { CarnivalArchive } from "@/components/events/CarnivalArchive";
+import { CarnivalExpect } from "@/components/events/CarnivalExpect";
+import { CarnivalChallenges } from "@/components/events/CarnivalChallenges";
+import { CarnivalGallery } from "@/components/events/CarnivalGallery";
+import { CarnivalCTA } from "@/components/events/CarnivalCTA";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -11,7 +19,15 @@ export default function DeltaStateFitnessCarnivalPage() {
   return (
     <main>
       <EventHero />
-      <EventInfo />
+      <CarnivalVideo />
+      <CarnivalIntro />
+      <CarnivalEnergy />
+      <CarnivalCommunity />
+      <CarnivalArchive />
+      <CarnivalExpect />
+      <CarnivalChallenges />
+      <CarnivalGallery />
+      <CarnivalCTA />
     </main>
   );
 }
